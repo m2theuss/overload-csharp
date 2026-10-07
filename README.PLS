@@ -1,0 +1,7 @@
+Before run the application, be sure that the user with the name "Overload" (or anyother thing, dont matter) has been created.
+Bellow is a simple command for to do that:
+ALTER SESSION SET CONTAINER = XEPDB1;
+DROP USER OVERLOAD CASCADE;
+CREATE USER OVERLOAD IDENTIFIED BY overload;
+GRANT CONNECT, RESOURCE TO OVERLOAD;
+GRANT UNLIMITED TABLESPACE TO OVERLOAD;
