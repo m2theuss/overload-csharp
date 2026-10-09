@@ -1,15 +1,22 @@
+using Microsoft.EntityFrameworkCore;
+using overload.Data;
 using overload.Entities;
-
 namespace overload.Services;
 
 public interface IUserService
 {
-    public Boolean create(User user);
+    public Task create(User user);
 }
 public class UserService : IUserService
-{
-    public Boolean create(User user)
+{  
+    private MyContext _myContext;
+    public UserService(MyContext myContext)
     {
-        return true;
+        this._myContext = myContext;
+    }
+    public async Task create(User user)
+    {
+        _myContext.Add<User>(user);
+        await _myContext.SaveChangesAsync();
     }
 }
