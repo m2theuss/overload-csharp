@@ -1,5 +1,7 @@
+using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using overload.Entities;
 
 namespace overload.Data.Configurations;
@@ -7,13 +9,13 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-         builder.HasKey(p => p.Id);
+        builder.HasKey(p => p.Id);
 
-        builder.Property(p => p.First_name)
+        builder.Property(p => p.FirstName)
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.Property(p => p.Last_name)
+        builder.Property(p => p.LastName)
             .IsRequired()
             .HasMaxLength(100);
 
@@ -29,7 +31,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(60);
 
-        builder.Property(p => p.Birthdate)
+        builder.Property(p => p.BirthDate)
+            .HasColumnType("date")
             .IsRequired();
     }
 }

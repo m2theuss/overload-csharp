@@ -1,28 +1,25 @@
 namespace overload.Controllers;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using overload.Data;
 using overload.Entities;
 using overload.Services;
 
 [Route("api/[controller]")]
 [ApiController]
-public class UserController : ControllerBase
+public class UserController(IUserService _userService) : ControllerBase
 {
-    private IUserService _userService;
-    public UserController(IUserService userService)
-    {
-        this._userService = userService; 
-    }
     [HttpGet]
-    public String heelo()
+    public String Hello()
     {
-        return "Overload - workout tracker v1.0";
+        return "Overload - Workout Tracker v1.0";
     }
     [HttpPost]
-    public IActionResult addUser(User user)
+    public async Task<IActionResult> AddUser(User user)
     {
-        _userService.create(user);
-        return Ok();  
+        var result = await _userService.create(user);
+        if(result.IsOk){
+            return Ok(new {Message = "User created successfully"});  
+        }
+        return StatusCode(result.Status, result);
     }
+    
 }
