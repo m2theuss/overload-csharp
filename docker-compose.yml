@@ -1,0 +1,29 @@
+services:
+    overload-db:
+        image: postgres:15-alpine
+        container_name: overload-db
+        environment:
+        #in here first of all the docker search for default environment values in .~/bash on linux
+        #so, if dont find, its search throught others ways (dont matter what) and finally get and try search on .env file in the same folder that compose.yml in running
+            POSTGRES_DB: ${NAME_DB}
+            POSTGRES_USER: ${NAME_USER}
+            POSTGRES_PASSWORD: ${PASSWORD_DB}
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+    overload-api:
+        container_name: overload-api
+        command: dotnet watch run --no-launch-profile
+        volumes:
+            - .:/app
+        image: overload-csharp:latest
+        ports:
+            - "5071:5071"
+        depends_on:
+            - overload-db
+        environment:
+            - ASPNETCORE_URLS=http://*:5071
+            - ConnectionStrings__PostgresConnection=Host=overload-db;Port=5432;Database=${NAME_DB};Username=${NAME_USER};Password=${PASSWORD_DB};Include Error Detail=true
+volumes: 
+    postgres_data:
