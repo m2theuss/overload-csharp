@@ -26,6 +26,8 @@ public class User
     public String Password { get; set; } = String.Empty;
 
     [Required(ErrorMessage = "Birth date must be filled")]
-    public DateOnly BirthDate { get; set; }
+    public DateOnly? BirthDate { get; set; }
+    
+    [JsonIgnore]
     public DateTime CreatedAt { get; init;} = DateTime.Now.ToUniversalTime();
 }
