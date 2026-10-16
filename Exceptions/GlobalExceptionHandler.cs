@@ -2,13 +2,13 @@ namespace overload.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-public class GlobalExceptionHandler : IExceptionHandler
+public class GlobalExceptionHandler<T> : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
         var baseResult = exception switch
         {
-            ApiBaseException baseEx => (int)baseEx.code,
+            ApiBaseException<T> baseEx => (int)baseEx.code,
             _ => 500
         };
         httpContext.Response.StatusCode = baseResult;
