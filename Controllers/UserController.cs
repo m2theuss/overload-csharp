@@ -1,6 +1,7 @@
 namespace overload.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using overload.Entities;
+using overload.Exceptions;
 using overload.Services;
 
 [Route("api/[controller]")]

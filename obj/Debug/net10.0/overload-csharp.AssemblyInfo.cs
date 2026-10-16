@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("overload-csharp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ceadcc5403e558a97d3fba0cb32d699d8156bf31")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e3c5fc7b59cd7e8d4faa47553f826791f41bfc6a")]
 [assembly: System.Reflection.AssemblyProductAttribute("overload-csharp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("overload-csharp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
