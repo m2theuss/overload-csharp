@@ -2,19 +2,79 @@ namespace overload.Utils;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
 using overload.Entities;
 
 public class JwtUtils{
+    private static readonly string SECRET_KEY = "7a8e66d9897ac53f037eb0b00fd8db1618b89c632749fefa4d7473a6b43b5b20";
     public static string generateJwtToken(User user){
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes("mypasswordverysafetyverygood");
+        var key = Encoding.ASCII.GetBytes(SECRET_KEY);
         var descriptor = new SecurityTokenDescriptor{ 
-            Subject = new ClaimsIdentity(new[] {new Claim("id",user.Id.ToString())}),
+            Subject = new ClaimsIdentity(new[] {
+                new Claim(
+                    "id",user.Id.ToString()
+                ),
+                new Claim(
+                    "username",user.Username
+                )
+            }),
             Expires = DateTime.UtcNow.AddMinutes(1),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
         var token = tokenHandler.CreateToken(descriptor);
         return tokenHandler.WriteToken(token);
     }
+    public static ClaimsPrincipal? validateJwtToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        var key = Encoding.ASCII.GetBytes(SECRET_KEY);
+
+        var validationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+
+            ValidateIssuer = false,
+            ValidateAudience = false,
+
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+
+        try
+        {
+            var principal = tokenHandler.ValidateToken(
+                token,
+                validationParameters,
+                out SecurityToken validatedToken
+            );
+
+            return principal;
+        }
+        catch (SecurityTokenException)
+        {
+            return null;
+        }
+        catch (ArgumentException)
+        {
+            return null;
+        }
+    }
 }
+public readonly struct TokenResponse
+{
+    public string Token{get;init;}
+    public string TokenType{get; init;}
+    public int ExpiresIn{get; init;}
+
+    public TokenResponse(string token, string tokenType, int expires)
+    {
+        Token = token;
+        TokenType = tokenType;
+        ExpiresIn = expires;
+    }
+}
+

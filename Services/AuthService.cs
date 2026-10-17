@@ -3,47 +3,42 @@ using overload.Data;
 using overload.DTOs;
 using overload.Entities;
 using overload.Services.Shared;
+using overload.Utils;
 using BC = BCrypt.Net.BCrypt;
 
 namespace overload.Services;
 
 public interface IAuthService{
-    public Task<ApiErrorResponse<string>> Login(UserDto userDto);
+    public Task<Result<string>> Login(UserDto userDto);
+    public bool UserInfo();
 }
 public class AuthService(MyContext _myContext) : IAuthService{
-    public async Task<ApiErrorResponse<string>> Login(UserDto userDto){
+    public async Task<Result<string>> Login(UserDto userDto){
         bool emailHasContent = !string.IsNullOrEmpty(userDto.Email);
         bool usernameHasContent = !string.IsNullOrEmpty(userDto.Username);
         if((emailHasContent && usernameHasContent) || (!emailHasContent && !usernameHasContent)){
-            return new ApiErrorResponse<string>{
-                Title = "Parameter conflicts",
-                Status = 400,
-                Details = new List<String> {"Please provinder either email or username"},
-                IsOk = false
-            };
+            return Result<string>.Error("Conflict","Please provinder either a e-mail or username",ErrorCode.InvalidData);
         }
         User? result;
         if(emailHasContent){
-            result = await _myContext.users.FirstOrDefaultAsync(e => e.Email == userDto.Email);
+            result = await _myContext.users.FirstOrDefaultAsync(e => e.Email == userDto.Email || e.Username == userDto.Username);
         }else{
             result = await _myContext.users.FirstOrDefaultAsync(e => e.Username == userDto.Username);
         }
 
         if(result != null){
             if(BC.Verify(userDto.Password, result.Password)){
-                return new ApiErrorResponse<string>{
-                    Title = "Credentials are right",
-                    Status = 200,
-                    Details = new List<String> {"Your token..."},
-                    IsOk = true
-                };
+                var generatedToken = JwtUtils.generateJwtToken(result);
+                if(generatedToken != null)
+                {
+                    return Result<string>.Ok(generatedToken);
+                }
             }
         }
-        return new ApiErrorResponse<string>{
-            Title = "Bad Credentials",
-            Status = 401,
-            Details = new List<String> {"Some credentials are incorrect"},
-            IsOk = false
-        };
+        return Result<string>.Error("Bad Credentials","Some credentials are incorrect", ErrorCode.BadCredentials);
+    }
+    public bool UserInfo()
+    {
+        return true;
     }
 }

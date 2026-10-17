@@ -21,9 +21,8 @@ public class User
     [Required(ErrorMessage = "Email must be filled")]
     public String Email { get; set; } = String.Empty;
 
-    [Required(ErrorMessage = "Password must be filled")]
     [StringLength(64, MinimumLength = 8, ErrorMessage = "Password must be beetween 8 and 64 characters")]
-    public String Password { get; set; } = String.Empty;
+    public String? Password { get; set; }
 
     [Required(ErrorMessage = "Birth date must be filled")]
     public DateOnly? BirthDate { get; set; }
