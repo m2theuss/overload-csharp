@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using overload.Entities;
 
 public class JwtUtils{
-    private static readonly string SECRET_KEY = "7a8e66d9897ac53f037eb0b00fd8db1618b89c632749fefa4d7473a6b43b5b20";
+    private static readonly string SECRET_KEY = "AuthConfiguration:Key";
     public static string generateJwtToken(User user){
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(SECRET_KEY);

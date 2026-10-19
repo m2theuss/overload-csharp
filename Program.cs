@@ -3,8 +3,28 @@ using overload.Common.Converters;
 using overload.Data;
 using overload.Exceptions;
 using overload.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddAuthentication(opt =>{
+    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(opt => {
+    opt.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["AuthConfiguration:Issuer"],
+        ValidAudience = builder.Configuration["AuthConfiguration:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["AuthConfiguration:Key"]!))
+    };
+});
+
 builder.Services.AddControllers()
     .ConfigureApiBehaviorOptions(options =>
     {
@@ -24,6 +44,8 @@ builder.Services.AddProblemDetails();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 var app = builder.Build();
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseExceptionHandler();
 app.MapControllers();
 app.Run();

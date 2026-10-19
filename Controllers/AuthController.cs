@@ -29,9 +29,4 @@ public class AuthController(IAuthService _authService) : ControllerBase{
         var structResult = new TokenResponse(result.Data!, "Bearer", 3000);
         return Ok(structResult);
     }
-    [HttpGet("info")]
-    public IActionResult GetInfo()
-    {
-        return Ok();
-    }
 }

@@ -7,6 +7,7 @@ using overload.Entities;
 using overload.Exceptions;
 using overload.Services;
 using overload.Services.Shared;
+using Microsoft.AspNetCore.Authorization;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -39,6 +40,16 @@ public class UserController(IUserService _userService) : ControllerBase
             statusCode: status,
             detail: errorDetails
         );
+    }
+    [Authorize]
+    [HttpGet("info")]
+    public IActionResult getInfo()
+    {
+        string name = User.FindFirst("username")?.Value;
+        if(name == null){
+            return BadRequest();
+        }
+        return Ok(name);
     }
     
 }
