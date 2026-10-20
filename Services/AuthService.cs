@@ -12,7 +12,8 @@ public interface IAuthService{
     public Task<Result<string>> Login(UserDto userDto);
     public bool UserInfo();
 }
-public class AuthService(MyContext _myContext) : IAuthService{
+public class AuthService(MyContext _myContext, JwtUtils _jwtUtils) : IAuthService{
+
     public async Task<Result<string>> Login(UserDto userDto){
         bool emailHasContent = !string.IsNullOrEmpty(userDto.Email);
         bool usernameHasContent = !string.IsNullOrEmpty(userDto.Username);
@@ -28,7 +29,7 @@ public class AuthService(MyContext _myContext) : IAuthService{
 
         if(result != null){
             if(BC.Verify(userDto.Password, result.Password)){
-                var generatedToken = JwtUtils.generateJwtToken(result);
+                var generatedToken = _jwtUtils.generateJwtToken(result);
                 if(generatedToken != null)
                 {
                     return Result<string>.Ok(generatedToken);

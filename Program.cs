@@ -6,6 +6,7 @@ using overload.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using overload.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthentication(opt =>{
@@ -14,8 +15,8 @@ builder.Services.AddAuthentication(opt =>{
 }).AddJwtBearer(opt => {
     opt.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
+        ValidateIssuer = false,
+        ValidateAudience = false,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["AuthConfiguration:Issuer"],
@@ -35,14 +36,17 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new SafeDateOnlyConverter());
     });
+
 var connectionString = builder.Configuration.GetConnectionString("PostgresConnection");
 builder.Services.AddDbContext<MyContext>(options =>
     options.UseNpgsql(connectionString)
 );
+
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<JwtUtils>();
 var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization();
