@@ -22,9 +22,9 @@ public class AuthService(MyContext _myContext, JwtUtils _jwtUtils) : IAuthServic
         }
         User? result;
         if(emailHasContent){
-            result = await _myContext.users.FirstOrDefaultAsync(e => e.Email == userDto.Email || e.Username == userDto.Username);
+            result = await _myContext.Users.FirstOrDefaultAsync(e => e.Email == userDto.Email || e.Username == userDto.Username);
         }else{
-            result = await _myContext.users.FirstOrDefaultAsync(e => e.Username == userDto.Username);
+            result = await _myContext.Users.FirstOrDefaultAsync(e => e.Username == userDto.Username);
         }
 
         if(result != null){

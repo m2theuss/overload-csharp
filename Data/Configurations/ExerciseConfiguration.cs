@@ -4,10 +4,14 @@ namespace overload.Data.Configurations;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using overload.Entities;
 
-public class ExerciceConfiguration : IEntityTypeConfiguration<Exercise>
+public class ExerciseConfiguration : IEntityTypeConfiguration<Exercise>
 {
     public void Configure(EntityTypeBuilder<Exercise> builder)
     {
-        throw new NotImplementedException();
+        builder.HasKey(e => e.Id);
+        builder.Property(e => e.Name).IsRequired();
+        builder.Property(e => e.IsPublic).IsRequired();
+        builder.Property(e => e.Type).IsRequired();
+        builder.Property(e => e.Muscle).IsRequired();
     }
 }

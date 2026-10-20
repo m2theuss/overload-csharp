@@ -27,5 +27,4 @@ public class User
     
     [JsonIgnore]
     public DateTime CreatedAt { get; init;} = DateTime.Now.ToUniversalTime();
-    public List<Exercise> Exercices{get; set;} = [];
 }

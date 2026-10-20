@@ -1,13 +1,28 @@
 using overload.Data;
 using overload.DTOs;
-public interface ExerciceService
+using overload.Entities;
+using overload.Services;
+public interface IExerciseService
 {
-    public void create(string id, ExerciseDto dto);
+    public Task Create(string id, ExerciseDto dto);
 }
-public class ExerciseService(MyContext _myContext)
+public class ExerciseService(MyContext _myContext, IUserService _userService) : IExerciseService
 {
-    public void create(string id, ExerciseDto dto)
+    public async Task Create(string id, ExerciseDto dto)
     {
-        _myContext.Add()
+        User user = _userService.FindUserById(int.Parse(id));
+        if(user == null)
+        {
+            return;
+        }
+        Exercise newExerc = new Exercise{
+            Name = dto.Name,
+            Author = user,
+            Type = dto.Type,
+            Muscle = dto.Muscle,
+            IsPublic = dto.IsPublic
+        };
+        _myContext.Add<Exercise>(newExerc);
+        await _myContext.SaveChangesAsync();
     }
 }
