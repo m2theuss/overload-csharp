@@ -43,5 +43,7 @@ public enum ErrorCode
     InvalidData,
     BadCredentials,
     InternalError,
-    DatabaseSaveFailure
+    DatabaseSaveFailure,
+    NameConflict,
+    Unauthorized
 }

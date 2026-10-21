@@ -26,7 +26,7 @@ public class AuthController(IAuthService _authService) : ControllerBase{
                 statusCode: errorCode
             );
         }
-        var structResult = new TokenResponse(result.Data!, "Bearer", 3000);
+        var structResult = new TokenResponse(result.Data!, "Bearer");
         return Ok(structResult);
     }
 }

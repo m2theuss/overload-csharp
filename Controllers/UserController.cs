@@ -19,7 +19,7 @@ public class UserController(IUserService _userService) : ControllerBase
         return "Overload - Workout Tracker v1.0";
     }
     [HttpPost]
-    public async Task<ActionResult<string>> AddUser(User user)
+    public async Task<ActionResult<string>> AddUser([FromBody]User user)
     {
         Result<string> result = await _userService.createAsync(user);
         if (!ModelState.IsValid)
@@ -45,7 +45,7 @@ public class UserController(IUserService _userService) : ControllerBase
     [HttpGet("info")]
     public IActionResult getInfo()
     {
-        string name = User.FindFirst("username")?.Value;
+        string name = User.FindFirst("username")?.Value!;
         if(name == null){
             return BadRequest();
         }

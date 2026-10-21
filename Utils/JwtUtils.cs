@@ -8,7 +8,7 @@ using overload.Entities;
 public class JwtUtils(IConfiguration _configuration){
     public string generateJwtToken(User user){
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_configuration["AuthConfiguration:Key"]);
+        var key = Encoding.ASCII.GetBytes(_configuration["AuthConfiguration:Key"]!);
         var descriptor = new SecurityTokenDescriptor{ 
             Subject = new ClaimsIdentity(new[] {
                 new Claim(
@@ -18,7 +18,7 @@ public class JwtUtils(IConfiguration _configuration){
                     "username",user.Username
                 )
             }),
-            Expires = DateTime.UtcNow.AddMinutes(1),
+            Expires = DateTime.UtcNow.AddMinutes(60),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
         var token = tokenHandler.CreateToken(descriptor);
@@ -28,7 +28,7 @@ public class JwtUtils(IConfiguration _configuration){
     {
         var tokenHandler = new JwtSecurityTokenHandler();
 
-        var key = Encoding.ASCII.GetBytes(_configuration["AuthConfiguration:Key"]);
+        var key = Encoding.ASCII.GetBytes(_configuration["AuthConfiguration:Key"]!);
 
         var validationParameters = new TokenValidationParameters
         {
@@ -67,7 +67,7 @@ public readonly struct TokenResponse
     public string Token{get;init;}
     public string TokenType{get; init;}
 
-    public TokenResponse(string token, string tokenType, int expires)
+    public TokenResponse(string token, string tokenType)
     {
         Token = token;
         TokenType = tokenType;

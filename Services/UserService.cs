@@ -31,7 +31,7 @@ public class UserService(MyContext _myContext) : IUserService
         return result;
     }
     private Result<string> CheckForRegistrationConflicts(string username, string email){
-        var conflict = _myContext.Users.Where((u => u.Username == username || u.Email == email))
+        var conflict = _myContext.users.Where((u => u.Username == username || u.Email == email))
                         .Select(u => new {u.Email, u.Username}).ToList();
 
         bool usernameExist = conflict.Any(u => u.Username == username);
@@ -56,6 +56,6 @@ public class UserService(MyContext _myContext) : IUserService
     }
     public User? FindUserById(int id)
     {
-        return _myContext.Users.FirstOrDefault(u => u.Id == id);
+        return _myContext.users.FirstOrDefault(u => u.Id == id);
     }
 }

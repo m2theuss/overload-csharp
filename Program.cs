@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using overload.Utils;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthentication(opt =>{
@@ -30,11 +31,12 @@ builder.Services.AddControllers()
     .ConfigureApiBehaviorOptions(options =>
     {
         // 1. Tell ASP.NET Core NOT to automatically send a 400 response
-        options.SuppressModelStateInvalidFilter = true;
+        options.SuppressModelStateInvalidFilter = false;
     })
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new SafeDateOnlyConverter());
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
 var connectionString = builder.Configuration.GetConnectionString("PostgresConnection");

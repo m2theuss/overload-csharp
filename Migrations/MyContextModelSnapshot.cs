@@ -39,21 +39,23 @@ namespace overload_csharp.Migrations
                     b.Property<bool>("IsPublic")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("Muscle")
-                        .HasColumnType("integer");
+                    b.Property<string>("Muscle")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AuthorId");
 
-                    b.ToTable("Exercises");
+                    b.ToTable("exercises");
                 });
 
             modelBuilder.Entity("overload.Entities.User", b =>
@@ -97,7 +99,7 @@ namespace overload_csharp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("users");
                 });
 
             modelBuilder.Entity("overload.Entities.Exercise", b =>
