@@ -44,11 +44,20 @@ public class ExerciseController(IExerciseService _exerciseService) : ControllerB
         }
         return Ok(await _exerciseService.GetAllAsync(int.Parse(strId)));
     }
-    [HttpPatch("{id}")]
-    public IActionResult UpdateExercise(int exerciseId, ExercisePatchDto patchDto)
+    [HttpPatch("{exerciseId}")]
+    public async Task<IActionResult> UpdateExercise(int exerciseId, ExercisePatchDto patchDto)
     {
-        _exerciseService.Update(exerciseId, patchDto);
-        return Ok();
+        string? authorId = User.FindFirst("id")?.Value;
+        if(authorId == null)
+        {
+            return Unauthorized("User not recognized");
+        }
+        Result<string> result = await _exerciseService.Update(exerciseId, patchDto, int.Parse(authorId));
+        if (result.IsOk)
+        {
+            return Ok();
+        }
+        return BadRequest(result.SingleError);
     }
 
 }
