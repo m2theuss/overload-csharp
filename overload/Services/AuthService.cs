@@ -1,3 +1,4 @@
+namespace overload.Services;
 using Microsoft.EntityFrameworkCore;
 using overload.Data;
 using overload.DTOs;
@@ -6,7 +7,6 @@ using overload.Services.Shared;
 using overload.Utils;
 using BC = BCrypt.Net.BCrypt;
 
-namespace overload.Services;
 
 public interface IAuthService{
     public Task<Result<string>> Login(UserDto userDto);

@@ -46,5 +46,5 @@ public enum ErrorCode
     DatabaseSaveFailure,
     NameConflict,
     Unauthorized,
-    ResourceNotFound
+    NotFound
 }

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using overload.DTOs;
 using overload.DTOs.Exercises;
 using overload.Services.Shared;
-
+using overload.Services;
 [Route("api/exercises")]
 [ApiController]
 [Authorize]
@@ -53,11 +53,20 @@ public class ExerciseController(IExerciseService _exerciseService) : ControllerB
             return Unauthorized("User not recognized");
         }
         Result<string> result = await _exerciseService.Update(exerciseId, patchDto, int.Parse(authorId));
-        if (result.IsOk)
+        var ParsedCodeError = result.Code switch
         {
-            return Ok();
+            ErrorCode.NotFound => 404,
+            _ => 500
+        };
+        if (!result.IsOk)
+        {
+            return Problem(
+                title: result.Title,
+                detail: result.SingleError,
+                statusCode: ParsedCodeError
+            );
         }
-        return BadRequest(result.SingleError);
+        return Ok();
     }
 
 }

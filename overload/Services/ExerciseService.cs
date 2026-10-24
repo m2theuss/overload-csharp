@@ -1,3 +1,4 @@
+namespace overload.Services;
 using Microsoft.EntityFrameworkCore;
 using overload.Data;
 using overload.DTOs;
@@ -48,13 +49,9 @@ public class ExerciseService(MyContext _myContext, IUserService _userService) : 
     public async Task<Result<string>> Update(int ExerciseId, ExercisePatchDto patchDto, int authorId)
     {
         Exercise? tmpEx = _myContext.exercises.FirstOrDefault(e => e.Id == ExerciseId);
-        if(tmpEx == null)
+        if(tmpEx == null || tmpEx.AuthorId != authorId)
         {
-            return Result<string>.Error("Data not found", "The provide exercise id dont was found, send just a integer that represents a id", ErrorCode.ResourceNotFound);
-        }
-        if(tmpEx.Author!.Id != authorId)
-        {
-            return Result<string>.Error("Unauthorized", "The exercise id provide dont belong to that user", ErrorCode.Unauthorized);
+            return Result<string>.Error("Data not found", "The exercise provide was not found", ErrorCode.NotFound);
         }
         if(patchDto.IsPublic is bool IsPublic) tmpEx.IsPublic = IsPublic;
         if(patchDto.Muscle is TargetMuscle muscle) tmpEx.Muscle = muscle;
