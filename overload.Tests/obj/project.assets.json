@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "targets": {
     "net10.0": {
       "BCrypt.Net-Next/4.2.0": {
@@ -2648,33 +2648,33 @@
     ]
   },
   "packageFolders": {
-    "/home/matheus/.nuget/packages/": {}
+    "C:\\Users\\matheus\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/matheus/Downloads/overload-csharp/overload.Tests/overload.Tests.csproj",
+      "projectUniqueName": "C:\\Users\\matheus\\Downloads\\overload-csharp\\overload.Tests\\overload.Tests.csproj",
       "projectName": "overload.Tests",
-      "projectPath": "/home/matheus/Downloads/overload-csharp/overload.Tests/overload.Tests.csproj",
-      "packagesPath": "/home/matheus/.nuget/packages/",
-      "outputPath": "/home/matheus/Downloads/overload-csharp/overload.Tests/obj/",
+      "projectPath": "C:\\Users\\matheus\\Downloads\\overload-csharp\\overload.Tests\\overload.Tests.csproj",
+      "packagesPath": "C:\\Users\\matheus\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\matheus\\Downloads\\overload-csharp\\overload.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/matheus/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\matheus\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
-        "/usr/lib/dotnet/library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net10.0": {
+          "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {
-            "/home/matheus/Downloads/overload-csharp/overload/overload-csharp.csproj": {
-              "projectPath": "/home/matheus/Downloads/overload-csharp/overload/overload-csharp.csproj"
+            "C:\\Users\\matheus\\Downloads\\overload-csharp\\overload\\overload-csharp.csproj": {
+              "projectPath": "C:\\Users\\matheus\\Downloads\\overload-csharp\\overload\\overload-csharp.csproj"
             }
           }
         }
@@ -2689,10 +2689,11 @@
         "auditLevel": "low",
         "auditMode": "all"
       },
-      "SdkAnalysisLevel": "10.0.100"
+      "SdkAnalysisLevel": "10.0.400"
     },
     "frameworks": {
       "net10.0": {
+        "framework": "net10.0",
         "targetAlias": "net10.0",
         "dependencies": {
           "Microsoft.NET.Test.Sdk": {
@@ -2732,7 +2733,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/10.0.112/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.CSharp": "(,4.7.32767]",
           "Microsoft.VisualBasic": "(,10.4.32767]",

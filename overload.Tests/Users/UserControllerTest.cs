@@ -9,7 +9,7 @@ using Xunit;
 public class UserControllerTest
 {
     [Fact]
-    public async Task MustCreateUserWhenDataWasValidated()
+    public async Task MustCreateUserWhenDataIsValid()
     {
         var mock = new Mock<IUserService>();
         mock.Setup(s => s.createAsync(
@@ -22,11 +22,10 @@ public class UserControllerTest
             FirstName = "João", 
             LastName = "Silva", 
             Username = "joaosilva", 
-            Email = "joao.silva@email.com", 
             Password = "SenhaSegura123", 
             BirthDate = new DateOnly(1995, 5, 15)
         };
         var result = await controller.AddUser(userDto);
-        Assert.IsType<OkObjectResult>(result);
+        Assert.IsType<OkObjectResult>(result.Result);
     }
 }

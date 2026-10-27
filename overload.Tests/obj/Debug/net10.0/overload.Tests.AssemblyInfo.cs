@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("overload.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fece6c8db8a88114b6aa2f9449abbd85bb33e158")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2be0103f61b08e02ab23b43db2555b5cb9e7b18e")]
 [assembly: System.Reflection.AssemblyProductAttribute("overload.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("overload.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
