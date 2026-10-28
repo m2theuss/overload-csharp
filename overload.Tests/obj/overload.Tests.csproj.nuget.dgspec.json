@@ -1,34 +1,34 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\matheus\\Downloads\\overload-csharp\\overload.Tests\\overload.Tests.csproj": {}
+    "/home/matheus/Downloads/overload-csharp/overload.Tests/overload.Tests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\matheus\\Downloads\\overload-csharp\\overload.Tests\\overload.Tests.csproj": {
+    "/home/matheus/Downloads/overload-csharp/overload.Tests/overload.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\matheus\\Downloads\\overload-csharp\\overload.Tests\\overload.Tests.csproj",
+        "projectUniqueName": "/home/matheus/Downloads/overload-csharp/overload.Tests/overload.Tests.csproj",
         "projectName": "overload.Tests",
-        "projectPath": "C:\\Users\\matheus\\Downloads\\overload-csharp\\overload.Tests\\overload.Tests.csproj",
-        "packagesPath": "C:\\Users\\matheus\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\matheus\\Downloads\\overload-csharp\\overload.Tests\\obj\\",
+        "projectPath": "/home/matheus/Downloads/overload-csharp/overload.Tests/overload.Tests.csproj",
+        "packagesPath": "/home/matheus/.nuget/packages/",
+        "outputPath": "/home/matheus/Downloads/overload-csharp/overload.Tests/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\matheus\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "/home/matheus/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
+          "/usr/lib/dotnet/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
-            "framework": "net10.0",
             "targetAlias": "net10.0",
             "projectReferences": {
-              "C:\\Users\\matheus\\Downloads\\overload-csharp\\overload\\overload-csharp.csproj": {
-                "projectPath": "C:\\Users\\matheus\\Downloads\\overload-csharp\\overload\\overload-csharp.csproj"
+              "/home/matheus/Downloads/overload-csharp/overload/overload-csharp.csproj": {
+                "projectPath": "/home/matheus/Downloads/overload-csharp/overload/overload-csharp.csproj"
               }
             }
           }
@@ -43,13 +43,16 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.400"
+        "SdkAnalysisLevel": "10.0.100"
       },
       "frameworks": {
         "net10.0": {
-          "framework": "net10.0",
           "targetAlias": "net10.0",
           "dependencies": {
+            "Microsoft.EntityFrameworkCore.Sqlite": {
+              "target": "Package",
+              "version": "[10.0.14, )"
+            },
             "Microsoft.NET.Test.Sdk": {
               "target": "Package",
               "version": "[17.14.1, )"
@@ -87,7 +90,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/10.0.112/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -365,27 +368,27 @@
         }
       }
     },
-    "C:\\Users\\matheus\\Downloads\\overload-csharp\\overload\\overload-csharp.csproj": {
+    "/home/matheus/Downloads/overload-csharp/overload/overload-csharp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\matheus\\Downloads\\overload-csharp\\overload\\overload-csharp.csproj",
+        "projectUniqueName": "/home/matheus/Downloads/overload-csharp/overload/overload-csharp.csproj",
         "projectName": "overload-csharp",
-        "projectPath": "C:\\Users\\matheus\\Downloads\\overload-csharp\\overload\\overload-csharp.csproj",
-        "packagesPath": "C:\\Users\\matheus\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\matheus\\Downloads\\overload-csharp\\overload\\obj\\",
+        "projectPath": "/home/matheus/Downloads/overload-csharp/overload/overload-csharp.csproj",
+        "packagesPath": "/home/matheus/.nuget/packages/",
+        "outputPath": "/home/matheus/Downloads/overload-csharp/overload/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\matheus\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "/home/matheus/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
+          "/usr/lib/dotnet/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
-            "framework": "net10.0",
             "targetAlias": "net10.0",
             "projectReferences": {}
           }
@@ -400,11 +403,10 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.400"
+        "SdkAnalysisLevel": "10.0.100"
       },
       "frameworks": {
         "net10.0": {
-          "framework": "net10.0",
           "targetAlias": "net10.0",
           "dependencies": {
             "BCrypt.Net-Next": {
@@ -465,7 +467,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/10.0.112/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

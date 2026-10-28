@@ -27,7 +27,7 @@ public class UserController(IUserService _userService) : ControllerBase
             return BadRequest(ModelState);
         }
         if(result.IsOk){
-            return Ok(new {Message = "User created successfully"});  
+            return Ok(new {Message = "User created"});  
         }
         int status = result.Code switch
         {

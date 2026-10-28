@@ -1,0 +1,2 @@
+rewrite the services to handle and validate fields empty etc.
+write exceptions to handle with "random" errors

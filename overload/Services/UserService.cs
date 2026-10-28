@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using overload.Data;
 using overload.Entities;
@@ -10,14 +11,21 @@ public interface IUserService
 {
     public Task<Result<string>> createAsync(User user);
     public User? FindUserById(int id);
+    public Result<string> UserIsValid(User user);
 }
 public class UserService(MyContext _myContext) : IUserService
 {  
     public async Task<Result<string>> createAsync(User user)
     {   
-        Result<string> result = CheckForRegistrationConflicts(user.Username, user.Email);
-        if(!result.IsOk){ // The method check...() just register all the enough information about whats happen before sent it
-            return result;
+        Result<string> conflictValidationResult = CheckForRegistrationConflicts(user.Username, user.Email);
+        if(!conflictValidationResult.IsOk){ // The method check...() just register all the enough information about whats happen before sent it
+            return conflictValidationResult;
+        }
+
+        Result<string> dataValidationResult = UserIsValid(user);
+        if (!dataValidationResult.IsOk)
+        {
+            return dataValidationResult;
         }
         user.Password = BC.HashPassword(user.Password);
         _myContext.Add<User>(user);
@@ -28,7 +36,7 @@ public class UserService(MyContext _myContext) : IUserService
                 ErrorCode.DatabaseSaveFailure
             );
         }
-        return result;
+        return Result<string>.Ok("Valid");
     }
     private Result<string> CheckForRegistrationConflicts(string username, string email){
         var conflict = _myContext.users.Where((u => u.Username == username || u.Email == email))
@@ -57,5 +65,14 @@ public class UserService(MyContext _myContext) : IUserService
     public User? FindUserById(int id)
     {
         return _myContext.users.FirstOrDefault(u => u.Id == id);
+    }
+    public Result<string> UserIsValid(User user)
+    {
+        var ctx = new ValidationContext(user);
+        var validationResult = new List<ValidationResult>();
+
+        bool isValid = Validator.TryValidateObject(user, ctx, validationResult, true);
+        List<string> errorsList = validationResult.Select(e => e.ErrorMessage ?? "Unkown error").ToList();
+        return Result<string>.Error("Invalid data", errorsList, ErrorCode.InvalidData);
     }
 }
