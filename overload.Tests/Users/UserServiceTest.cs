@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using overload.Data;
 using overload.Entities;
 using overload.Services;
-
+namespace overload.Tests.Users;
 public class DbUserFixture : IAsyncLifetime
 {
     private SqliteConnection _conn = default!;
@@ -34,8 +34,8 @@ public class UserServiceTest : IClassFixture<DbUserFixture>
     [Fact]
     public async Task MustCreateUserWhenDataValid()
     {
-        UserService service = new UserService(_fixture.ctx);
-        User user = new User
+        UserService service = new(_fixture.ctx);
+        User user = new()
         {
             FirstName = "Joshn",
             LastName = "Dsoe",
@@ -53,8 +53,8 @@ public class UserServiceTest : IClassFixture<DbUserFixture>
     [Fact]
     public async Task DontMustCreateUserWhenDataIsTheSame()
     {
-        UserService service = new UserService(_fixture.ctx);
-        User user = new User
+        UserService service = new(_fixture.ctx);
+        User user = new()
         {
             FirstName = "Joshn",
             LastName = "Dsoe",
