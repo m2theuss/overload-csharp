@@ -12,11 +12,17 @@ public class Result<T>
     [JsonIgnore]
     public ErrorCode Code{get;init;}
     
-    public static Result<T> Ok(T data) => 
+    public static Result<T> OkWithData(T data) => 
         new Result<T>
         {
             IsOk = true,
             Data = data
+        };
+    public static Result<string> OkWithMessage(string singleError) =>
+        new Result<string>
+        {
+            IsOk = true,
+            SingleError = singleError
         };
     public static Result<T> Error(string title, string singleError, ErrorCode code) => 
         new Result<T>

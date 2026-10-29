@@ -29,14 +29,14 @@ public class UserService(MyContext _myContext) : IUserService
         }
         user.Password = BC.HashPassword(user.Password);
         _myContext.Add<User>(user);
-        if(await _myContext.SaveChangesAsync() < 0){ // less than 0 means that the update returns 0 affected rows...
+        if(await _myContext.SaveChangesAsync() == 0){ // less than 0 means that the update returns 0 affected rows...
             return Result<string>.Error(
                 "Internal error",
                 "A error happen when try save the changes, try again or later",
                 ErrorCode.DatabaseSaveFailure
             );
         }
-        return Result<string>.Ok("Valid");
+        return Result<string>.OkWithMessage("Valid");
     }
     private Result<string> CheckForRegistrationConflicts(string username, string email){
         var conflict = _myContext.users.Where((u => u.Username == username || u.Email == email))
@@ -55,7 +55,7 @@ public class UserService(MyContext _myContext) : IUserService
             details.Add("This email isn't available");
         }
         return details.Count == 0 ? 
-            Result<string>.Ok("Valid") : 
+            Result<string>.OkWithMessage("Valid") : 
             Result<string>.Error(
                 "Conflict",
                 details,
@@ -68,11 +68,15 @@ public class UserService(MyContext _myContext) : IUserService
     }
     public Result<string> UserIsValid(User user)
     {
-        var ctx = new ValidationContext(user);
-        var validationResult = new List<ValidationResult>();
+        var context = new ValidationContext(user);
+        var validationResult = new List<ValidationResult>(); // validation result and possibles errors
 
-        bool isValid = Validator.TryValidateObject(user, ctx, validationResult, true);
+        bool isValid = Validator.TryValidateObject(user, context, validationResult, true);
         List<string> errorsList = validationResult.Select(e => e.ErrorMessage ?? "Unkown error").ToList();
-        return Result<string>.Error("Invalid data", errorsList, ErrorCode.InvalidData);
+        if (!isValid)
+        {   
+            return Result<string>.Error("Invalid data", errorsList, ErrorCode.InvalidData);
+        }
+        return Result<string>.OkWithMessage("Valid");
     }
 }

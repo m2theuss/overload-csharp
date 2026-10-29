@@ -32,7 +32,7 @@ public class AuthService(MyContext _myContext, JwtUtils _jwtUtils) : IAuthServic
                 var generatedToken = _jwtUtils.generateJwtToken(result);
                 if(generatedToken != null)
                 {
-                    return Result<string>.Ok(generatedToken);
+                    return Result<string>.OkWithData(generatedToken);
                 }
             }
         }
