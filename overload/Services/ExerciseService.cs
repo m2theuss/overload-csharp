@@ -36,7 +36,7 @@ public class ExerciseService(MyContext _myContext, IUserService _userService) : 
         }
         _myContext.Add<Exercise>(newExerc);
         await _myContext.SaveChangesAsync();
-        return Result<string>.Ok("Exercise created");
+        return Result<string>.OkWithMessage("Exercise created");
     }
     private async Task<bool> ExerciseNameIsAvailable(string name, int authorId)
     {
@@ -58,6 +58,6 @@ public class ExerciseService(MyContext _myContext, IUserService _userService) : 
         if(patchDto.Type is ExerciseType type) tmpEx.Type = type;
         if(patchDto.Name is string name) tmpEx.Name = name;
         await _myContext.SaveChangesAsync();
-        return Result<string>.Ok("Exercise update");
+        return Result<string>.OkWithMessage("Exercise update");
     }
 }

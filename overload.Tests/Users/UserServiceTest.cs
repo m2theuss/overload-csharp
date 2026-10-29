@@ -4,21 +4,40 @@ using overload.Data;
 using overload.Entities;
 using overload.Services;
 
-public class UserServiceTest
+public class DbUserFixture : IAsyncLifetime
 {
+    private SqliteConnection _conn = default!;
+    public MyContext ctx{get; private set;} = default!;
+    public async Task InitializeAsync()
+    {
+        _conn = new SqliteConnection("Data Source=:memory:");
+        await _conn.OpenAsync();
+        var opt = new DbContextOptionsBuilder<MyContext>().UseSqlite(_conn).Options;
+        ctx = new MyContext(opt);
+        await ctx.Database.EnsureCreatedAsync(); 
+    }
+    public async Task DisposeAsync()
+    {
+        if(_conn != null) _conn.Dispose();
+        if(ctx != null) ctx.Dispose();
+    }
+    
+}
+public class UserServiceTest : IClassFixture<DbUserFixture>
+{
+    private readonly DbUserFixture _fixture;
+
+    public UserServiceTest(DbUserFixture dbFixture)
+    {
+        _fixture = dbFixture;
+    }
     [Fact]
     public async Task MustCreateUserWhenDataValid()
     {
-        await using var conn = new SqliteConnection("Data source=memory:");
-        await conn.OpenAsync();
-        var opt = new DbContextOptionsBuilder<MyContext>().UseSqlite(conn).Options; 
-        await using var ctx = new MyContext(opt);
-        await ctx.Database.EnsureCreatedAsync();
-
-        UserService service = new UserService(ctx);
+        UserService service = new UserService(_fixture.ctx);
         User user = new User
         {
-             FirstName = "Joshn",
+            FirstName = "Joshn",
             LastName = "Dsoe",
             Username = "johsndoe",
             Email = "johndoes@email.com",
@@ -28,6 +47,23 @@ public class UserServiceTest
 
         var result = await service.createAsync(user);
 
-        Assert.Equal("Valid",result.Data);
+        Assert.True(result.IsOk);
+    }
+
+    [Fact]
+    public async Task DontMustCreateUserWhenDataIsTheSame()
+    {
+        UserService service = new UserService(_fixture.ctx);
+        User user = new User
+        {
+            FirstName = "Joshn",
+            LastName = "Dsoe",
+            Username = "johsndoe",
+            Email = "johndoes@email.com",
+            Password = "Password123!",
+            BirthDate = new DateOnly(1995, 5, 15)
+        };
+        var result = await service.createAsync(user);
+        Assert.False(result.IsOk);
     }
 }
