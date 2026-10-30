@@ -36,9 +36,18 @@ public class ExerciseServiceTest : IClassFixture<DbExerciseFixture>
     public async Task MustCreateExerciseWhenTheDataIsValid()
     {
         Mock<IUserService> userServiceMock = new();
-        userServiceMock.Setup(e => e.FindUserById(1)).Returns(new User{Id = 1,Password="11111111"});
+        userServiceMock.Setup(e => e.FindUserById(1)).Returns(new User
+        {
+            Id = 1,
+            FirstName = "Test",
+            LastName = "User",
+            Username = "testuser",
+            Email = "test@email.com",
+            Password = "11111111",
+            BirthDate = new DateOnly(2000, 1, 1)
+        });
+
         ExerciseService service = new(_fixture.ctx, userServiceMock.Object);
-        var a = userServiceMock.Object;
 
         var exerciseDto = new ExerciseDto
         {
@@ -48,6 +57,6 @@ public class ExerciseServiceTest : IClassFixture<DbExerciseFixture>
             IsPublic = true
         };
         var result = await service.CreateAsync(1, exerciseDto);
-        Assert.True(result.IsOk);
+        Assert.True(result.IsOk, $"The message of the error is: {result.SingleError}");
     }
 }
