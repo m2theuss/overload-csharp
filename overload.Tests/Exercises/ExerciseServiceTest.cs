@@ -3,11 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using overload.Data;
 using overload.DTOs;
+using overload.DTOs.Exercises;
 using overload.Entities;
 using overload.Entities.Enums;
 using overload.Services;
 namespace overload.Tests.Exercises;
-public class DbExerciseFixture : IAsyncLifetime
+public class ExerciseServiceTest : IAsyncLifetime
 {
     public SqliteConnection _conn = default!;
     public MyContext ctx {get;set;} = default!;
@@ -24,17 +25,10 @@ public class DbExerciseFixture : IAsyncLifetime
         if(ctx != null) await ctx.DisposeAsync();
         if(_conn != null) await _conn.DisposeAsync();
     }
-}
-public class ExerciseServiceTest : IClassFixture<DbExerciseFixture>
-{
-    private readonly DbExerciseFixture _fixture;
-    public ExerciseServiceTest(DbExerciseFixture dbFixture)
-    {
-        _fixture = dbFixture;
-    }
     [Fact]
-    public async Task MustCreateExerciseWhenTheDataIsValid()
+    public async Task MustCreateExerciseWhenTheUserExist()
     {
+        const int USER_ID = 1;
         Mock<IUserService> userServiceMock = new();
         userServiceMock.Setup(e => e.FindUserById(1)).Returns(new User
         {
@@ -47,16 +41,90 @@ public class ExerciseServiceTest : IClassFixture<DbExerciseFixture>
             BirthDate = new DateOnly(2000, 1, 1)
         });
 
-        ExerciseService service = new(_fixture.ctx, userServiceMock.Object);
+        ExerciseService service = new(ctx, userServiceMock.Object);
 
         var exerciseDto = new ExerciseDto
         {
-            Name = "Supino Reto com Halteres",
+            Name = "Leg Pres",
             Muscle = TargetMuscle.Chest,
             Type = ExerciseType.FreeWeight,
             IsPublic = true
         };
-        var result = await service.CreateAsync(1, exerciseDto);
+        var result = await service.CreateAsync(USER_ID, exerciseDto);
         Assert.True(result.IsOk, $"The message of the error is: {result.SingleError}");
+    }
+    [Fact]
+    public async Task Should_UpdateExercise_When_UserIsTheAuthor()
+    {
+        const int USER_ID = 1;
+        const int EXERC_ID = 1;
+        Mock<IUserService> userServiceMock = new ();
+        ExerciseService exercise = new (ctx, userServiceMock.Object);
+        await CreateUserHelper(EXERC_ID); // off course a exercise can never exists before a user, so this method must run BEFORE the bellow
+        await CreateExerciseHelper(USER_ID, EXERC_ID);
+
+        ExercisePatchDto updatedExercise = new()
+        {
+            Name = "Supino Reto com Halteres",
+            Muscle = TargetMuscle.Chest, 
+            Type = ExerciseType.Bodyweight, 
+            IsPublic = true
+        };
+        var result = await exercise.Update(EXERC_ID, updatedExercise,USER_ID);
+        Assert.True(result.IsOk, $"The error follows: {result.SingleError}");
+    }
+    [Fact]
+    public async Task Shoud_FailUpdateExercise_When_UserIsNotTheAuthor()
+    {
+        const int USER_ID_ORIGINAL = 1;
+        const int EXERC_ID = 20; // diferent id of the author
+        const int USER_ID_IMPOSTOR = 30;
+        var userServiceMock = new Mock<IUserService>();
+        ExerciseService exerciseService = new (ctx, userServiceMock.Object);
+        await CreateUserHelper(USER_ID_ORIGINAL); // off course a exercise can never exists before a user, so this method must run BEFORE the bellow
+        await CreateUserHelper(USER_ID_IMPOSTOR); 
+        
+        await CreateExerciseHelper(EXERC_ID, USER_ID_ORIGINAL); // this exercise belong to the author with the id number of 20
+
+        ExercisePatchDto updatedExercise = new()
+        {
+            Name = "Supino Reto com Halteres",
+            Muscle = TargetMuscle.Chest, 
+            Type = ExerciseType.Bodyweight, 
+            IsPublic = true
+        };
+        var result = await exerciseService.Update(EXERC_ID, updatedExercise,USER_ID_IMPOSTOR);
+        Assert.False(result.IsOk, $"The error follows: {result.SingleError}");
+    }
+    public async Task<User> CreateUserHelper(int id)
+    {
+        var user = new User 
+        { 
+            Id = id,
+            FirstName = "Test",
+            LastName = "User",
+            Username = "testuser",
+            Email = "test@email.com",
+            Password = "11111111",
+            BirthDate = new DateOnly(2000, 1, 1)
+        };
+        ctx.users.Add(user);
+        await ctx.SaveChangesAsync();
+        return user;
+    }
+    public async Task<Exercise> CreateExerciseHelper(int exerciseId, int authorId)
+    {
+        Exercise exercise = new()
+        {
+            Id = exerciseId,
+            Name = "Biceps",
+            Muscle = TargetMuscle.Back,
+            Type = ExerciseType.Cable,
+            AuthorId = authorId,
+            IsPublic = false
+        };
+        ctx.exercises.Add(exercise);
+        await ctx.SaveChangesAsync();
+        return exercise;
     }
 }

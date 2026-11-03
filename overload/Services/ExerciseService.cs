@@ -58,6 +58,6 @@ public class ExerciseService(MyContext _myContext, IUserService _userService) : 
         if(patchDto.Type is ExerciseType type) tmpEx.Type = type;
         if(patchDto.Name is string name) tmpEx.Name = name;
         await _myContext.SaveChangesAsync();
-        return Result<string>.OkWithMessage("Exercise update");
+        return Result<string>.OkWithMessage("Exercise updated");
     }
 }

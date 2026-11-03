@@ -11,6 +11,8 @@ public class MyContext : DbContext
     }
     public DbSet<User> users{get; set;}
     public DbSet<Exercise> exercises{get; set;}
+    public DbSet<Routine> routines{get;set;}
+    public DbSet<RoutineExercise> routine_exercises{get;set;}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

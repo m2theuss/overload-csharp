@@ -13,11 +13,8 @@ public class ExerciseController(IExerciseService _exerciseService) : ControllerB
     [HttpPost]
     public async Task<IActionResult> AddExercise(ExerciseDto dto)
     {
-        string? UserId = User.FindFirst("id")?.Value;
-        if(string.IsNullOrEmpty(UserId))
-        {
-            return Unauthorized("User not recognized");
-        }
+        string? UserId = User.FindFirst("id")?.Value ?? throw new InvalidOperationException("The claim 'id' was not found in the token");
+
         Result<string> result = await _exerciseService.CreateAsync(int.Parse(UserId), dto);
         int CodeInt = result.Code switch{
             ErrorCode.BadCredentials => 401,
