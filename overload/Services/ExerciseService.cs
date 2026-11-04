@@ -9,9 +9,10 @@ using overload.Services.Shared;
 using overload.Entities.Enums;
 public interface IExerciseService
 {
-    public Task<Result<string>> CreateAsync(int UserId, ExerciseDto dto);
+    public Task<Result<string>> CreateAsync(int userId, ExerciseDto dto);
     public Task<List<Exercise>> GetAllAsync(int UserId);
-    public Task<Result<string>> Update(int ExerciseId, ExercisePatchDto patchDto, int authorId);
+    public Task<Result<string>> Update(int exerciseId, ExercisePatchDto patchDto, int authorId);
+    public Task<Exercise?> FindExerciseById(int exerciseId);
 
 }
 public class ExerciseService(MyContext _myContext, IUserService _userService) : IExerciseService
@@ -59,5 +60,9 @@ public class ExerciseService(MyContext _myContext, IUserService _userService) : 
         if(patchDto.Name is string name) tmpEx.Name = name;
         await _myContext.SaveChangesAsync();
         return Result<string>.OkWithMessage("Exercise updated");
+    }
+    public async Task<Exercise?> FindExerciseById(int exerciseId)
+    {
+        return await _myContext.exercises.FirstOrDefaultAsync(e => e.Id == exerciseId);
     }
 }
