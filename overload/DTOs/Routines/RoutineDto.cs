@@ -1,4 +1,4 @@
-namespace overload.DTOs;
+namespace overload.DTOs.Routines;
 public class RoutineDto
 {
     public string? Name { get; set; }

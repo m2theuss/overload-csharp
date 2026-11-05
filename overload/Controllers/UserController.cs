@@ -46,10 +46,21 @@ public class UserController(IUserService _userService) : ControllerBase
     public IActionResult getInfo()
     {
         string name = User.FindFirst("username")?.Value!;
+        string id = User.FindFirst("id")?.Value!;
         if(name == null){
             return BadRequest();
         }
-        return Ok(name);
+        return Ok(new UserInfoResult(name,id));
     }
     
+}
+public struct UserInfoResult
+{
+    public string Name{get;set;}
+    public string Id{get;set;}
+    public UserInfoResult(string name, string id)
+    {
+        Name = name;
+        Id = id;
+    }
 }

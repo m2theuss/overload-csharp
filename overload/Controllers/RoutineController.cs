@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using overload.DTOs;
+using overload.DTOs.Routines;
+using overload.Entities;
 using overload.Services;
 using overload.Services.Shared;
 
 namespace overload.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/routines")]
 [ApiController]
 public class RoutineController(IRoutineService _routineService) : ControllerBase
 {
@@ -17,15 +19,17 @@ public class RoutineController(IRoutineService _routineService) : ControllerBase
         UserHasValidId(out int userId);
         await _routineService.CreateRoutine(userId, routineDto);
     }
-    [HttpPost("addRoutine")]
-    public async Task<Result<string>> AddRoutineExercise(int exerciseId, int routineId, int order) // add a exercise into a routine
+
+    //add a exercise into a routine
+    [HttpPost("{routineId}/exercises")]
+    public async Task<Result<string>> AddRoutineExercise([FromBody] RoutineExerciseDto dto, int routineId) // add a exercise into a routine
     {
         UserHasValidId(out int authorId);
-        var result = await _routineService.AddRoutineExercise(authorId, exerciseId, order, routineId);
+        var result = await _routineService.AddRoutineExercise(dto, routineId, authorId);
         return result;
 
     }
-    private bool UserHasValidId(out int userId)
+    private bool UserHasValidId(out int userId) // method for internal validation
     {
         string? stringUserId = User.FindFirst("id")?.Value ?? throw new InvalidOperationException("The claim 'id' was not found in the token");
         if(int.TryParse(stringUserId, out int value))
@@ -38,6 +42,16 @@ public class RoutineController(IRoutineService _routineService) : ControllerBase
             userId = -1;
             return false;
         }
-
     }
+    [Authorize]
+    [HttpGet("users/{anonId}/routines")]
+    public ActionResult<ICollection<Routine>> GetAllRoutinesById(int anonId)
+    {
+        UserHasValidId(out int userId);
+        if(userId != anonId)
+        {
+            return NotFound();
+        }
+        return Ok(_routineService.GetAllById(userId));
+    } 
 }

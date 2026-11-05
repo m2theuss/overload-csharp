@@ -1,13 +1,15 @@
 using Microsoft.AspNetCore.Authorization;
 using overload.Data;
 using overload.DTOs;
+using overload.DTOs.Routines;
 using overload.Entities;
 using overload.Services.Shared;
 namespace overload.Services;
 public interface IRoutineService
 {
     public Task<Result<string>> CreateRoutine(int authorId, RoutineDto routineDto);
-    public Task<Result<string>> AddRoutineExercise(int authorId, int exerciseId, int Order, int routineId);
+    public Task<Result<string>> AddRoutineExercise(RoutineExerciseDto dto, int routineId, int userId);
+    public ICollection<Routine> GetAllById(int userId);
 }
 public class RoutineService(MyContext _myContext, IExerciseService _exerciseService) : IRoutineService
 {
@@ -27,18 +29,19 @@ public class RoutineService(MyContext _myContext, IExerciseService _exerciseServ
         }
         return Result<string>.Error("Database problem", "A error happen when try save the changes", ErrorCode.DatabaseSaveFailure);
     }
-    public async Task<Result<string>> AddRoutineExercise(int authorId, int exerciseId, int order, int routineId)
+    public async Task<Result<string>> AddRoutineExercise(RoutineExerciseDto dto, int routineId, int userId)
     {
-        Exercise? exercise = await _exerciseService.FindExerciseById(authorId);
+        Exercise? exercise = await _exerciseService.FindExerciseById(dto.ExerciseId);
         Routine? routine = await FindRoutineById(routineId);
-        if(exercise == null || exercise.AuthorId != authorId || routine == null || routine.AuthorId == authorId)
+
+        if(routine == null || exercise == null || routine.AuthorId != userId || exercise.AuthorId != userId)
         {
             return Result<string>.Error("Not found","The requested exercise could not be found.",ErrorCode.NotFound);
         }
         RoutineExercise routineExercise = new RoutineExercise
         {
             ExerciseId = exercise.AuthorId,
-            Order = order,
+            Order = dto.Order,
             RoutineId = routine.AuthorId
         };
         _myContext.routine_exercises.Add(routineExercise);
@@ -49,5 +52,9 @@ public class RoutineService(MyContext _myContext, IExerciseService _exerciseServ
     public async Task<Routine?> FindRoutineById(int routineId)
     {
         return _myContext.routines.FirstOrDefault(e => e.Id == routineId);
+    }
+    public ICollection<Routine> GetAllById(int userId)
+    {
+        return _myContext.routines.Where(e => e.AuthorId == userId).ToList();
     }
 }
