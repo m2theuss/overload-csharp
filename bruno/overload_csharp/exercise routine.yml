@@ -1,0 +1,27 @@
+info:
+  name: exercise routine
+  type: http
+  seq: 7
+
+http:
+  method: POST
+  url: localhost:5071/api/routines/10/exercises
+  headers:
+    - name: Authorization
+      value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEwIiwidXNlcm5hbWUiOiJqb2huZG9lMTIzMzIiLCJuYmYiOjE3OTM4MzcxNTMsImV4cCI6MTc5Mzg0MDc1MywiaWF0IjoxNzkzODM3MTUzfQ.Y6fhjm6S5srrsJCF5bA4EAKvBX5wY5F7zVrWe7Lyd-w
+  body:
+    type: json
+    data: |-
+      {
+        "exerciseId" : 17,
+        "routineid" : 9,
+        "order" : 1
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

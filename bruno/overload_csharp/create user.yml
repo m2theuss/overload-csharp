@@ -1,0 +1,27 @@
+info:
+  name: create user
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: localhost:5071/api/user
+  body:
+    type: json
+    data: |
+      {
+        "FirstName": "John",
+        "LastName": "Doe",
+        "Username": "jowhndoe12332",
+        "Email": "jowhn.doe@example.co1m.br.com",
+        "Password": "12345672",
+        "BirthDate": "1995-08-25"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

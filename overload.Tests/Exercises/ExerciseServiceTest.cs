@@ -51,7 +51,7 @@ public class ExerciseServiceTest : IAsyncLifetime
             IsPublic = true
         };
         var result = await service.CreateAsync(USER_ID, exerciseDto);
-        Assert.True(result.IsOk, $"The message of the error is: {result.SingleError}");
+        Assert.True(result.IsOk, $"The message of the error is: {result.Message}");
     }
     [Fact]
     public async Task Should_UpdateExercise_When_UserIsTheAuthor()
@@ -71,7 +71,7 @@ public class ExerciseServiceTest : IAsyncLifetime
             IsPublic = true
         };
         var result = await exercise.Update(EXERC_ID, updatedExercise,USER_ID);
-        Assert.True(result.IsOk, $"The error follows: {result.SingleError}");
+        Assert.True(result.IsOk, $"The error follows: {result.Message}");
     }
     [Fact]
     public async Task Shoud_FailUpdateExercise_When_UserIsNotTheAuthor()
@@ -94,7 +94,7 @@ public class ExerciseServiceTest : IAsyncLifetime
             IsPublic = true
         };
         var result = await exerciseService.Update(EXERC_ID, updatedExercise,USER_ID_IMPOSTOR);
-        Assert.False(result.IsOk, $"The error follows: {result.SingleError}");
+        Assert.False(result.IsOk, $"The error follows: {result.Message}");
     }
     public async Task<User> CreateUserHelper(int id)
     {
