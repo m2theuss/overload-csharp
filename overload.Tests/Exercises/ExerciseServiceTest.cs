@@ -7,18 +7,18 @@ using overload.DTOs.Exercises;
 using overload.Entities;
 using overload.Entities.Enums;
 using overload.Services;
+using overload.Tests.TestUtils;
 namespace overload.Tests.Exercises;
-public class ExerciseServiceTest : IAsyncLifetime
+public class ExerciseServiceTest(IContextHandler handler) : IAsyncLifetime
 {
     public SqliteConnection _conn = default!;
     public MyContext ctx {get;set;} = default!;
+
     public async Task InitializeAsync()
     {
-        _conn = new SqliteConnection("Data Source=:memory:");
-        await _conn.OpenAsync();
-        var opt = new DbContextOptionsBuilder<MyContext>().UseSqlite(_conn).Options;
-        ctx = new MyContext(opt);
-        await ctx.Database.EnsureCreatedAsync();
+        DatabaseInfo dbinfo = await handler.InitializeContextAsync();
+        _conn = dbinfo.conection!;
+        ctx = dbinfo.context!;
     }
     public async Task DisposeAsync()
     {
@@ -60,8 +60,8 @@ public class ExerciseServiceTest : IAsyncLifetime
         const int EXERC_ID = 1;
         Mock<IUserService> userServiceMock = new ();
         ExerciseService exercise = new (ctx, userServiceMock.Object);
-        await CreateUserHelper(EXERC_ID); // off course a exercise can never exists before a user, so this method must run BEFORE the bellow
-        await CreateExerciseHelper(USER_ID, EXERC_ID);
+        var author = await CreateUserHelper(USER_ID); // off course a exercise can never exists before a user, so this method must run BEFORE the bellow
+        var exerciseItem = await CreateExerciseHelper(USER_ID, EXERC_ID);
 
         ExercisePatchDto updatedExercise = new()
         {
@@ -70,7 +70,8 @@ public class ExerciseServiceTest : IAsyncLifetime
             Type = ExerciseType.Bodyweight, 
             IsPublic = true
         };
-        var result = await exercise.Update(EXERC_ID, updatedExercise,USER_ID);
+        ctx.ChangeTracker.Clear();
+        var result = await exercise.Update(exerciseItem.Id, updatedExercise,author.Id);
         Assert.True(result.IsOk, $"The error follows: {result.Message}");
     }
     [Fact]
@@ -78,11 +79,11 @@ public class ExerciseServiceTest : IAsyncLifetime
     {
         const int USER_ID_ORIGINAL = 1;
         const int EXERC_ID = 20; // diferent id of the author
-        const int USER_ID_IMPOSTOR = 30;
+        const int USER_IMPOSTOR = 30;
         var userServiceMock = new Mock<IUserService>();
         ExerciseService exerciseService = new (ctx, userServiceMock.Object);
         await CreateUserHelper(USER_ID_ORIGINAL); // off course a exercise can never exists before a user, so this method must run BEFORE the bellow
-        await CreateUserHelper(USER_ID_IMPOSTOR); 
+        await CreateUserHelper(USER_IMPOSTOR); 
         
         await CreateExerciseHelper(EXERC_ID, USER_ID_ORIGINAL); // this exercise belong to the author with the id number of 20
 
@@ -93,7 +94,8 @@ public class ExerciseServiceTest : IAsyncLifetime
             Type = ExerciseType.Bodyweight, 
             IsPublic = true
         };
-        var result = await exerciseService.Update(EXERC_ID, updatedExercise,USER_ID_IMPOSTOR);
+        ctx.ChangeTracker.Clear();
+        var result = await exerciseService.Update(EXERC_ID, updatedExercise,USER_IMPOSTOR);
         Assert.False(result.IsOk, $"The error follows: {result.Message}");
     }
     public async Task<User> CreateUserHelper(int id)

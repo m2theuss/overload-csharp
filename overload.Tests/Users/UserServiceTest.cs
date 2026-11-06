@@ -18,8 +18,8 @@ public class DbUserFixture : IAsyncLifetime
     }
     public async Task DisposeAsync()
     {
-        if(_conn != null) _conn.Dispose();
-        if(ctx != null) ctx.Dispose();
+        _conn?.Dispose();
+        ctx?.Dispose();
     }
     
 }

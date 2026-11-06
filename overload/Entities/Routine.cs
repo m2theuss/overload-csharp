@@ -10,7 +10,7 @@ public class Routine
     public bool IsPublic {get; set;}
     public int AuthorId{get;set;}
     [JsonIgnore]
-    public User Author{get;set;}
+    public User? Author{get;set;}
     [JsonIgnore]
     public DateTime CreatedAt{get; init;} = DateTime.Now.ToUniversalTime();
 
