@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using overload.Data;
 using overload.DTOs;
 using overload.DTOs.Routines;
@@ -40,18 +42,52 @@ public class RoutineService(MyContext _myContext, IExerciseService _exerciseServ
         }
         RoutineExercise routineExercise = new RoutineExercise
         {
-            ExerciseId = exercise.AuthorId,
+            ExerciseId = dto.ExerciseId,
             Order = dto.Order,
-            RoutineId = routine.AuthorId
+            RoutineId = routineId
         };
+        if (await IsAlreadyRegistred(routineExercise))
+        {
+            return Result<string>.Error("Data conflict", "Almost have a exercise with that id registred on this routine", ErrorCode.DataConflict);
+        }
+        await ResolveOrder(routineExercise);
         _myContext.routine_exercises.Add(routineExercise);
         var result = await _myContext.SaveChangesAsync();
         return result > 0 ? Result<string>.OkWithMessage("Exercise has been added to the routine")
             : Result<string>.Error("Database problem", "A error happen when try save the changes", ErrorCode.DatabaseSaveFailure);
     }
-    public async Task<Routine?> FindRoutineById(int routineId)
+    private async Task<Routine?> FindRoutineById(int routineId)
     {
         return _myContext.routines.FirstOrDefault(e => e.Id == routineId);
+    }
+    private async Task ResolveOrder(RoutineExercise newRoutineExercise)
+    {
+        int amount =_myContext.routine_exercises.Where(e => e.RoutineId == newRoutineExercise.RoutineId).Count();
+        if(amount == 0 || newRoutineExercise.Order > amount || newRoutineExercise.Order == 0)
+        {
+            newRoutineExercise.Order = ++amount;
+            return;
+        }
+        if(amount == newRoutineExercise.Order)
+        {
+            RoutineExercise lastInOrder = await _myContext.routine_exercises.FirstOrDefaultAsync(e => e.Order == amount) 
+                ?? throw new KeyNotFoundException("A error happen when try to replace the last routine in order");
+            newRoutineExercise.Order = lastInOrder.Order;
+            lastInOrder.Order = ++amount;
+            await _myContext.SaveChangesAsync();
+            return;
+        }
+        RoutineExercise replacedOrderRoutine = await _myContext.routine_exercises.FirstOrDefaultAsync(e => e.Order == newRoutineExercise.Order)
+            ?? throw new KeyNotFoundException("A error happen when try to get the exsercise to be replaced");
+            newRoutineExercise.Order = replacedOrderRoutine.Order;
+            replacedOrderRoutine.Order = ++amount;
+            await _myContext.SaveChangesAsync();
+    }
+    private async Task<bool> IsAlreadyRegistred(RoutineExercise newRoutineExercise)
+    {
+        var result = await _myContext.routine_exercises.FirstOrDefaultAsync(e => e.RoutineId == newRoutineExercise.RoutineId 
+            && e.ExerciseId == newRoutineExercise.ExerciseId);
+        return result != null ? true : false;
     }
     public ICollection<Routine> GetAllById(int userId)
     {

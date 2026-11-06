@@ -24,7 +24,7 @@ public class ExerciseController(IExerciseService _exerciseService) : ControllerB
         {
             return Problem(
                 title: result.Title,
-                detail: result.SingleError,
+                detail: result.Message,
                 statusCode: CodeInt
             );
         }
@@ -58,7 +58,7 @@ public class ExerciseController(IExerciseService _exerciseService) : ControllerB
         {
             return Problem(
                 title: result.Title,
-                detail: result.SingleError,
+                detail: result.Message,
                 statusCode: ParsedCodeError
             );
         }

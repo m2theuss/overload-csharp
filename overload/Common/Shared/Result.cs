@@ -8,7 +8,7 @@ public class Result<T>
     public String Title{get; init;} = string.Empty;
     public T? Data{get; init;}
     public List<string> ErrorsList {get;init;} = new();
-    public string SingleError{get; set;} = string.Empty;
+    public string Message{get; set;} = string.Empty;
     [JsonIgnore]
     public ErrorCode Code{get;init;}
     
@@ -18,18 +18,18 @@ public class Result<T>
             IsOk = true,
             Data = data
         };
-    public static Result<string> OkWithMessage(string singleError) =>
+    public static Result<string> OkWithMessage(string message) =>
         new Result<string>
         {
             IsOk = true,
-            SingleError = singleError
+            Message = message
         };
-    public static Result<T> Error(string title, string singleError, ErrorCode code) => 
+    public static Result<T> Error(string title, string message, ErrorCode code) => 
         new Result<T>
         {
             IsOk = false, 
             Title = title, 
-            SingleError = singleError,
+            Message = message,
             Code = code
     };
     public static Result<T> Error(string title, ICollection<string> errorsList, ErrorCode code) => 
@@ -52,5 +52,6 @@ public enum ErrorCode
     DatabaseSaveFailure,
     NameConflict,
     Unauthorized,
-    NotFound
+    NotFound,
+    DataConflict
 }

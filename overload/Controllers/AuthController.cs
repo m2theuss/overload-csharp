@@ -22,7 +22,7 @@ public class AuthController(IAuthService _authService) : ControllerBase{
             };
             return Problem(
                 title: result.Title,
-                detail: result.SingleError,
+                detail: result.Message,
                 statusCode: errorCode
             );
         }
