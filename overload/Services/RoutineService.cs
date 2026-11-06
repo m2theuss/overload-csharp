@@ -7,6 +7,7 @@ using overload.DTOs.Routines;
 using overload.Entities;
 using overload.Services.Shared;
 namespace overload.Services;
+
 public interface IRoutineService
 {
     public Task<Result<string>> CreateRoutine(int authorId, RoutineDto routineDto);
@@ -36,9 +37,9 @@ public class RoutineService(MyContext _myContext, IExerciseService _exerciseServ
         Exercise? exercise = await _exerciseService.FindExerciseById(dto.ExerciseId);
         Routine? routine = await FindRoutineById(routineId);
 
-        if(routine == null || exercise == null || routine.AuthorId != userId || exercise.AuthorId != userId)
+        if (routine == null || exercise == null || routine.AuthorId != userId || exercise.AuthorId != userId)
         {
-            return Result<string>.Error("Not found","The requested exercise could not be found.",ErrorCode.NotFound);
+            return Result<string>.Error("Not found", "The requested exercise could not be found.", ErrorCode.NotFound);
         }
         RoutineExercise routineExercise = new RoutineExercise
         {
@@ -62,15 +63,15 @@ public class RoutineService(MyContext _myContext, IExerciseService _exerciseServ
     }
     private async Task ResolveOrder(RoutineExercise newRoutineExercise)
     {
-        int amount =_myContext.routine_exercises.Where(e => e.RoutineId == newRoutineExercise.RoutineId).Count();
-        if(amount == 0 || newRoutineExercise.Order > amount || newRoutineExercise.Order == 0)
+        int amount = _myContext.routine_exercises.Where(e => e.RoutineId == newRoutineExercise.RoutineId).Count();
+        if (amount == 0 || newRoutineExercise.Order > amount || newRoutineExercise.Order == 0)
         {
             newRoutineExercise.Order = ++amount;
             return;
         }
-        if(amount == newRoutineExercise.Order)
+        if (amount == newRoutineExercise.Order)
         {
-            RoutineExercise lastInOrder = await _myContext.routine_exercises.FirstOrDefaultAsync(e => e.Order == amount) 
+            RoutineExercise lastInOrder = await _myContext.routine_exercises.FirstOrDefaultAsync(e => e.Order == amount)
                 ?? throw new KeyNotFoundException("A error happen when try to replace the last routine in order");
             newRoutineExercise.Order = lastInOrder.Order;
             lastInOrder.Order = ++amount;
@@ -79,13 +80,13 @@ public class RoutineService(MyContext _myContext, IExerciseService _exerciseServ
         }
         RoutineExercise replacedOrderRoutine = await _myContext.routine_exercises.FirstOrDefaultAsync(e => e.Order == newRoutineExercise.Order)
             ?? throw new KeyNotFoundException("A error happen when try to get the exsercise to be replaced");
-            newRoutineExercise.Order = replacedOrderRoutine.Order;
-            replacedOrderRoutine.Order = ++amount;
-            await _myContext.SaveChangesAsync();
+        newRoutineExercise.Order = replacedOrderRoutine.Order;
+        replacedOrderRoutine.Order = ++amount;
+        await _myContext.SaveChangesAsync();
     }
     private async Task<bool> IsAlreadyRegistred(RoutineExercise newRoutineExercise)
     {
-        var result = await _myContext.routine_exercises.FirstOrDefaultAsync(e => e.RoutineId == newRoutineExercise.RoutineId 
+        var result = await _myContext.routine_exercises.FirstOrDefaultAsync(e => e.RoutineId == newRoutineExercise.RoutineId
             && e.ExerciseId == newRoutineExercise.ExerciseId);
         return result != null ? true : false;
     }
