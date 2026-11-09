@@ -1,29 +1,33 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using overload.Data;
 using overload.DTOs;
 using overload.DTOs.Exercises;
 using overload.Entities;
 using overload.Entities.Enums;
+using overload.Fixtures;
 using overload.Services;
 using overload.Tests.TestUtils;
 namespace overload.Tests.Exercises;
-public class ExerciseServiceTest(IContextHandler handler) : IAsyncLifetime
-{
-    public SqliteConnection _conn = default!;
-    public MyContext ctx {get;set;} = default!;
 
+[Collection("Integration Test")]
+public class ExerciseServiceTest : IAsyncLifetime
+{
+    public IContextHandler _handler{get;set;}
+
+    public ExerciseServiceTest(TestFixture fixture){
+        var scope = fixture.Provider.CreateAsyncScope();
+        _handler = scope.ServiceProvider.GetRequiredService<IContextHandler>();
+    }
     public async Task InitializeAsync()
     {
-        DatabaseInfo dbinfo = await handler.InitializeContextAsync();
-        _conn = dbinfo.conection!;
-        ctx = dbinfo.context!;
+        await _handler.InitializeContextAsync();
     }
     public async Task DisposeAsync()
     {
-        if(ctx != null) await ctx.DisposeAsync();
-        if(_conn != null) await _conn.DisposeAsync();
+        await _handler.DisposeAsync();
     }
     [Fact]
     public async Task MustCreateExerciseWhenTheUserExist()
@@ -41,7 +45,7 @@ public class ExerciseServiceTest(IContextHandler handler) : IAsyncLifetime
             BirthDate = new DateOnly(2000, 1, 1)
         });
 
-        ExerciseService service = new(ctx, userServiceMock.Object);
+        ExerciseService service = new(_ctx, userServiceMock.Object);
 
         var exerciseDto = new ExerciseDto
         {
@@ -59,7 +63,7 @@ public class ExerciseServiceTest(IContextHandler handler) : IAsyncLifetime
         const int USER_ID = 1;
         const int EXERC_ID = 1;
         Mock<IUserService> userServiceMock = new ();
-        ExerciseService exercise = new (ctx, userServiceMock.Object);
+        ExerciseService exercise = new (_ctx, userServiceMock.Object);
         var author = await CreateUserHelper(USER_ID); // off course a exercise can never exists before a user, so this method must run BEFORE the bellow
         var exerciseItem = await CreateExerciseHelper(USER_ID, EXERC_ID);
 
@@ -70,7 +74,7 @@ public class ExerciseServiceTest(IContextHandler handler) : IAsyncLifetime
             Type = ExerciseType.Bodyweight, 
             IsPublic = true
         };
-        ctx.ChangeTracker.Clear();
+        _ctx.ChangeTracker.Clear();
         var result = await exercise.Update(exerciseItem.Id, updatedExercise,author.Id);
         Assert.True(result.IsOk, $"The error follows: {result.Message}");
     }
@@ -81,7 +85,7 @@ public class ExerciseServiceTest(IContextHandler handler) : IAsyncLifetime
         const int EXERC_ID = 20; // diferent id of the author
         const int USER_IMPOSTOR = 30;
         var userServiceMock = new Mock<IUserService>();
-        ExerciseService exerciseService = new (ctx, userServiceMock.Object);
+        ExerciseService exerciseService = new (_ctx, userServiceMock.Object);
         await CreateUserHelper(USER_ID_ORIGINAL); // off course a exercise can never exists before a user, so this method must run BEFORE the bellow
         await CreateUserHelper(USER_IMPOSTOR); 
         
@@ -94,7 +98,7 @@ public class ExerciseServiceTest(IContextHandler handler) : IAsyncLifetime
             Type = ExerciseType.Bodyweight, 
             IsPublic = true
         };
-        ctx.ChangeTracker.Clear();
+        _ctx.ChangeTracker.Clear();
         var result = await exerciseService.Update(EXERC_ID, updatedExercise,USER_IMPOSTOR);
         Assert.False(result.IsOk, $"The error follows: {result.Message}");
     }
@@ -110,8 +114,8 @@ public class ExerciseServiceTest(IContextHandler handler) : IAsyncLifetime
             Password = "11111111",
             BirthDate = new DateOnly(2000, 1, 1)
         };
-        ctx.users.Add(user);
-        await ctx.SaveChangesAsync();
+        _ctx.users.Add(user);
+        await _ctx.SaveChangesAsync();
         return user;
     }
     public async Task<Exercise> CreateExerciseHelper(int exerciseId, int authorId)
@@ -125,8 +129,8 @@ public class ExerciseServiceTest(IContextHandler handler) : IAsyncLifetime
             AuthorId = authorId,
             IsPublic = false
         };
-        ctx.exercises.Add(exercise);
-        await ctx.SaveChangesAsync();
+        _ctx.exercises.Add(exercise);
+        await _ctx.SaveChangesAsync();
         return exercise;
     }
 }
