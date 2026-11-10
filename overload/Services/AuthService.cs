@@ -1,4 +1,6 @@
 namespace overload.Services;
+
+using System.Reflection.Metadata.Ecma335;
 using Microsoft.EntityFrameworkCore;
 using overload.Data;
 using overload.DTOs;
@@ -9,12 +11,12 @@ using BC = BCrypt.Net.BCrypt;
 
 
 public interface IAuthService{
-    public Task<Result<string>> Login(UserDto userDto);
+    public Task<Result<string>> LoginAsync(UserDto userDto);
     public bool UserInfo();
 }
 public class AuthService(MyContext _myContext, JwtUtils _jwtUtils) : IAuthService{
 
-    public async Task<Result<string>> Login(UserDto userDto){
+    public async Task<Result<string>> LoginAsync(UserDto userDto){
         bool emailHasContent = !string.IsNullOrEmpty(userDto.Email);
         bool usernameHasContent = !string.IsNullOrEmpty(userDto.Username);
         if((emailHasContent && usernameHasContent) || (!emailHasContent && !usernameHasContent)){
@@ -34,9 +36,10 @@ public class AuthService(MyContext _myContext, JwtUtils _jwtUtils) : IAuthServic
                 {
                     return Result<string>.OkWithData(generatedToken);
                 }
+                return Result<string>.Error("Internal error", "Some problem happen when try to generete the token",ErrorCode.InternalError);
             }
         }
-        return Result<string>.Error("Bad Credentials","Some credentials are incorrect", ErrorCode.BadCredentials);
+        return Result<string>.Error("Bad Credentials", "Some credentials are incorrect", ErrorCode.BadCredentials);
     }
     public bool UserInfo()
     {

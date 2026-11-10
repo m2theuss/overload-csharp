@@ -5,10 +5,18 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using overload.Entities;
 
-public class JwtUtils(IConfiguration _configuration){
-    public string generateJwtToken(User user){
+public class JwtUtils{
+    private IConfiguration? _configuration{get;set;}
+    protected JwtUtils()
+    {
+        
+    }
+    public JwtUtils(IConfiguration config){
+        _configuration = config;
+    }
+    public virtual string generateJwtToken(User user){
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_configuration["AuthConfiguration:Key"]!);
+        var key = Encoding.ASCII.GetBytes(_configuration!["AuthConfiguration:Key"]!);
         var descriptor = new SecurityTokenDescriptor{ 
             Subject = new ClaimsIdentity(new[] {
                 new Claim(
@@ -28,7 +36,7 @@ public class JwtUtils(IConfiguration _configuration){
     {
         var tokenHandler = new JwtSecurityTokenHandler();
 
-        var key = Encoding.ASCII.GetBytes(_configuration["AuthConfiguration:Key"]!);
+        var key = Encoding.ASCII.GetBytes(_configuration!["AuthConfiguration:Key"]!);
 
         var validationParameters = new TokenValidationParameters
         {

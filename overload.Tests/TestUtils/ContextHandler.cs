@@ -7,6 +7,8 @@ namespace overload.Tests.TestUtils;
 
 public interface IContextHandler
 {
+    public SqliteConnection? Connection{get;set;}
+    public MyContext? Context{get;set;}
     public Task InitializeContextAsync(); 
     public ValueTask DisposeAsync();
 }

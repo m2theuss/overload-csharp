@@ -45,7 +45,7 @@ public class ExerciseServiceTest : IAsyncLifetime
             BirthDate = new DateOnly(2000, 1, 1)
         });
 
-        ExerciseService service = new(_ctx, userServiceMock.Object);
+        ExerciseService service = new(_handler.Context!, userServiceMock.Object);
 
         var exerciseDto = new ExerciseDto
         {
@@ -63,7 +63,7 @@ public class ExerciseServiceTest : IAsyncLifetime
         const int USER_ID = 1;
         const int EXERC_ID = 1;
         Mock<IUserService> userServiceMock = new ();
-        ExerciseService exercise = new (_ctx, userServiceMock.Object);
+        ExerciseService exercise = new (_handler.Context!, userServiceMock.Object);
         var author = await CreateUserHelper(USER_ID); // off course a exercise can never exists before a user, so this method must run BEFORE the bellow
         var exerciseItem = await CreateExerciseHelper(USER_ID, EXERC_ID);
 
@@ -74,7 +74,7 @@ public class ExerciseServiceTest : IAsyncLifetime
             Type = ExerciseType.Bodyweight, 
             IsPublic = true
         };
-        _ctx.ChangeTracker.Clear();
+        _handler.Context!.ChangeTracker.Clear();
         var result = await exercise.Update(exerciseItem.Id, updatedExercise,author.Id);
         Assert.True(result.IsOk, $"The error follows: {result.Message}");
     }
@@ -85,7 +85,7 @@ public class ExerciseServiceTest : IAsyncLifetime
         const int EXERC_ID = 20; // diferent id of the author
         const int USER_IMPOSTOR = 30;
         var userServiceMock = new Mock<IUserService>();
-        ExerciseService exerciseService = new (_ctx, userServiceMock.Object);
+        ExerciseService exerciseService = new (_handler.Context!, userServiceMock.Object);
         await CreateUserHelper(USER_ID_ORIGINAL); // off course a exercise can never exists before a user, so this method must run BEFORE the bellow
         await CreateUserHelper(USER_IMPOSTOR); 
         
@@ -98,7 +98,7 @@ public class ExerciseServiceTest : IAsyncLifetime
             Type = ExerciseType.Bodyweight, 
             IsPublic = true
         };
-        _ctx.ChangeTracker.Clear();
+        _handler.Context!.ChangeTracker.Clear();
         var result = await exerciseService.Update(EXERC_ID, updatedExercise,USER_IMPOSTOR);
         Assert.False(result.IsOk, $"The error follows: {result.Message}");
     }
@@ -114,8 +114,8 @@ public class ExerciseServiceTest : IAsyncLifetime
             Password = "11111111",
             BirthDate = new DateOnly(2000, 1, 1)
         };
-        _ctx.users.Add(user);
-        await _ctx.SaveChangesAsync();
+        _handler.Context!.users.Add(user);
+        await _handler.Context.SaveChangesAsync();
         return user;
     }
     public async Task<Exercise> CreateExerciseHelper(int exerciseId, int authorId)
@@ -129,8 +129,8 @@ public class ExerciseServiceTest : IAsyncLifetime
             AuthorId = authorId,
             IsPublic = false
         };
-        _ctx.exercises.Add(exercise);
-        await _ctx.SaveChangesAsync();
+        _handler.Context!.exercises.Add(exercise);
+        await _handler.Context.SaveChangesAsync();
         return exercise;
     }
 }

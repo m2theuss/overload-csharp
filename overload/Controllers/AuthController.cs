@@ -11,7 +11,7 @@ public class AuthController(IAuthService _authService) : ControllerBase{
 
     [HttpPost("login")]
     public async Task<IActionResult> UserLogin(UserDto userDto){
-        Result<string> result = await _authService.Login(userDto);
+        Result<string> result = await _authService.LoginAsync(userDto);
         if (!result.IsOk)
         {
             var errorCode = result.Code switch
