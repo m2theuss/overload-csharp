@@ -10,14 +10,18 @@ namespace overload.Services;
 
 public interface IRoutineService
 {
-    public Task<Result<string>> CreateRoutine(int authorId, RoutineDto routineDto);
+    public Task<Result<string>> CreateRoutineAsync(int authorId, RoutineDto routineDto);
     public Task<Result<string>> AddRoutineExercise(RoutineExerciseDto dto, int routineId, int userId);
     public ICollection<Routine> GetAllById(int userId);
 }
-public class RoutineService(MyContext _myContext, IExerciseService _exerciseService) : IRoutineService
+public class RoutineService(MyContext _myContext, IExerciseService _exerciseService, IUserService userService) : IRoutineService
 {
-    public async Task<Result<string>> CreateRoutine(int AuthorId, RoutineDto routineDto)
+    public async Task<Result<string>> CreateRoutineAsync(int AuthorId, RoutineDto routineDto)
     {
+        if(userService.FindUserById(AuthorId) == null)
+        {
+            return Result<string>.Error("User not found", "The send id of user was note found", ErrorCode.NotFound);
+        }
         Routine routineExercise = new Routine
         {
             Name = routineDto.Name,

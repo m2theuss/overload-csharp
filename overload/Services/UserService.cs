@@ -62,7 +62,7 @@ public class UserService(MyContext _myContext) : IUserService
                 ErrorCode.UsernameOrEmailAlreadyExist
             );
     }
-    public User? FindUserById(int id)
+    public virtual User? FindUserById(int id)
     {
         return _myContext.users.FirstOrDefault(u => u.Id == id);
     }

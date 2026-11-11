@@ -17,7 +17,7 @@ public class RoutineController(IRoutineService _routineService) : ControllerBase
     public async Task Create(RoutineDto routineDto)
     {
         UserHasValidId(out int userId);
-        await _routineService.CreateRoutine(userId, routineDto);
+        await _routineService.CreateRoutineAsync(userId, routineDto);
     }
 
     //add a exercise into a routine
@@ -44,14 +44,10 @@ public class RoutineController(IRoutineService _routineService) : ControllerBase
         }
     }
     [Authorize]
-    [HttpGet("users/{anonId}/routines")]
-    public ActionResult<ICollection<Routine>> GetAllRoutinesById(int anonId)
+    [HttpGet()]
+    public ActionResult<ICollection<Routine>> GetAllRoutinesById()
     {
         UserHasValidId(out int userId);
-        if(userId != anonId)
-        {
-            return NotFound();
-        }
         return Ok(_routineService.GetAllById(userId));
     } 
 }

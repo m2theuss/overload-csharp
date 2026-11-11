@@ -11,7 +11,7 @@ public interface IExerciseService
 {
     public Task<Result<string>> CreateAsync(int userId, ExerciseDto dto);
     public Task<List<Exercise>> GetAllAsync(int UserId);
-    public Task<Result<string>> Update(int exerciseId, ExercisePatchDto patchDto, int authorId);
+    public Task<Result<string>> UpdateAsync(int exerciseId, ExercisePatchDto patchDto, int authorId);
     public Task<Exercise?> FindExerciseById(int exerciseId);
 
 }
@@ -47,7 +47,7 @@ public class ExerciseService(MyContext _myContext, IUserService _userService) : 
     {
         return await _myContext.exercises.Where(e => e.Author!.Id == UserId).ToListAsync();
     }
-    public async Task<Result<string>> Update(int ExerciseId, ExercisePatchDto patchDto, int authorId)
+    public async Task<Result<string>> UpdateAsync(int ExerciseId, ExercisePatchDto patchDto, int authorId)
     {
         Exercise? tmpEx = _myContext.exercises.FirstOrDefault(e => e.Id == ExerciseId);
         if(tmpEx == null || tmpEx.AuthorId != authorId)

@@ -16,13 +16,16 @@ namespace overload.Tests.Auth;
 [Collection("Integration Test")]
 public class AuthServiceTest : IAsyncLifetime
 {
+    private AsyncServiceScope _scope; //this allow that each test have a clean context handler and be able to use dispose on that
     private IContextHandler? Handler{get;set;}
     public AuthServiceTest(TestFixture fixture)
     {
-        Handler = fixture?.Provider.GetRequiredService<IContextHandler>(); //when i call Icontext... inside the fixture this give me a non interface Context class
+        _scope = fixture.Provider.CreateAsyncScope();
+        Handler = _scope.ServiceProvider.GetRequiredService<IContextHandler>(); //when i call Icontext... inside the fixture this give me a non interface Context class
     }
     public async Task InitializeAsync()
     {
+        await _scope.DisposeAsync();
         await Handler!.InitializeContextAsync();
     }
     public async Task DisposeAsync()
@@ -47,12 +50,12 @@ public class AuthServiceTest : IAsyncLifetime
     {
         var jwtMock = new Mock<JwtUtils>();
         jwtMock.Setup(e => e.generateJwtToken(It.IsAny<User>())).Returns("jwtRepresentation");
-        AuthService service = new AuthService(Handler.Context, jwtMock.Object);
+        AuthService service = new AuthService(Handler!.Context!, jwtMock.Object);
 
         UserDto dto = GenerateUserDto("username", string.Empty /*here must be empty*/, "password");
         User user = GenerateUser(dto.Username, "myemail@com.br", dto.Password); //inside this method the password is encoded using bcript;
 
-        Handler.Context.users.Add(user);
+        Handler!.Context!.users.Add(user);
         await Handler.Context.SaveChangesAsync();
         
         var result = await service.LoginAsync(dto);

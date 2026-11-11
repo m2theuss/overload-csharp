@@ -48,7 +48,7 @@ public class ExerciseController(IExerciseService _exerciseService) : ControllerB
         {
             return Unauthorized("User not recognized");
         }
-        Result<string> result = await _exerciseService.Update(exerciseId, patchDto, int.Parse(authorId));
+        Result<string> result = await _exerciseService.UpdateAsync(exerciseId, patchDto, int.Parse(authorId));
         var ParsedCodeError = result.Code switch
         {
             ErrorCode.NotFound => 404,
