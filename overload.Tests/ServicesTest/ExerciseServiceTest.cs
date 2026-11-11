@@ -12,26 +12,14 @@ using overload.Entities.Enums;
 using overload.Fixtures;
 using overload.Services;
 using overload.Services.Shared;
-using overload.Tests.TestUtils;
-namespace overload.Tests.Exercises;
+using overload.Tests.Common;
+using overload.Tests.Data;
+namespace overload.Tests.ServicesTest;
 
 [Collection("Integration Test")]
-public class ExerciseServiceTest : IAsyncLifetime
+public class ExerciseServiceTest : IntegrationTestBase
 {
-    public IContextHandler Handler{get;set;}
-
-    public ExerciseServiceTest(TestFixture fixture){
-        var scope = fixture.Provider.CreateAsyncScope();
-        Handler = scope.ServiceProvider.GetRequiredService<IContextHandler>();
-    }
-    public async Task InitializeAsync()
-    {
-        await Handler.InitializeContextAsync();
-    }
-    public async Task DisposeAsync()
-    {
-        await Handler.DisposeAsync();
-    }
+    public ExerciseServiceTest(TestFixture Fixture) : base (Fixture){}
     [Fact]
     public async Task Should_CreateExercise_When_UserExist()
     {
@@ -83,8 +71,8 @@ public class ExerciseServiceTest : IAsyncLifetime
         var userService = new Mock<IUserService>();
         var exService = new ExerciseService(Handler.Context!, userService.Object);
 
-        var user = await CreateUserHelperAsync(userId);
-        var ex = await CreateExerciseHelperAsync(exeId, user.Id);
+        var user = await SeedUserAsync(userId);
+        var ex = await SeedExerciseAsync(exeId, user.Id);
         var exerciseDto = new ExerciseDto{
             Name = ex.Name, Muscle = ex.Muscle, Type = ex.Type, IsPublic = ex.IsPublic
         };
@@ -99,8 +87,8 @@ public class ExerciseServiceTest : IAsyncLifetime
         const int EXERC_ID = 1;
         Mock<IUserService> userServiceMock = new ();
         ExerciseService exercise = new (Handler.Context!, userServiceMock.Object);
-        var author = await CreateUserHelperAsync(USER_ID); // off course a exercise can never exists before a user, so this method must run BEFORE the bellow
-        var exerciseItem = await CreateExerciseHelperAsync(USER_ID, EXERC_ID);
+        var author = await SeedUserAsync(USER_ID); // off course a exercise can never exists before a user, so this method must run BEFORE the bellow
+        var exerciseItem = await SeedExerciseAsync(USER_ID, EXERC_ID);
 
         ExercisePatchDto updatedExercise = new()
         {
@@ -121,10 +109,10 @@ public class ExerciseServiceTest : IAsyncLifetime
         const int USER_IMPOSTOR = 30;
         var userServiceMock = new Mock<IUserService>();
         ExerciseService exerciseService = new (Handler.Context!, userServiceMock.Object);
-        await CreateUserHelperAsync(USER_ID_ORIGINAL); // off course a exercise can never exists before a user, so this method must run BEFORE the bellow
-        await CreateUserHelperAsync(USER_IMPOSTOR); 
+        await SeedUserAsync(USER_ID_ORIGINAL); // off course a exercise can never exists before a user, so this method must run BEFORE the bellow
+        await SeedUserAsync(USER_IMPOSTOR); 
         
-        await CreateExerciseHelperAsync(EXERC_ID, USER_ID_ORIGINAL); // this exercise belong to the author with the id number of 20
+        await SeedExerciseAsync(EXERC_ID, USER_ID_ORIGINAL); // this exercise belong to the author with the id number of 20
 
         ExercisePatchDto updatedExercise = new()
         {
@@ -145,38 +133,6 @@ public class ExerciseServiceTest : IAsyncLifetime
         var result = await exerciseService.UpdateAsync(1, new ExercisePatchDto{}, 1);
         Assert.False(result.IsOk);
     }
-    
-    private async Task<User> CreateUserHelperAsync(int id)
-    {
-        var user = new User 
-        { 
-            Id = id,
-            FirstName = "Test",
-            LastName = "User",
-            Username = "testuser",
-            Email = "test@email.com",
-            Password = "11111111",
-            BirthDate = new DateOnly(2000, 1, 1)
-        };
-        Handler.Context!.users.Add(user);
-        await Handler.Context.SaveChangesAsync();
-        return user;
-    }
-    private async Task<Exercise> CreateExerciseHelperAsync(int exerciseId, int authorId)
-    {
-        Exercise exercise = new()
-        {
-            Id = exerciseId,
-            Name = "Biceps",
-            Muscle = TargetMuscle.Back,
-            Type = ExerciseType.Cable,
-            AuthorId = authorId,
-            IsPublic = false
-        };
-        Handler.Context!.exercises.Add(exercise);
-        await Handler.Context.SaveChangesAsync();
-        return exercise;
-    }
 
     [Fact]
     public async Task Should_ReturnOnlyUserExercises_When_UserIdIsProvided()
@@ -189,12 +145,12 @@ public class ExerciseServiceTest : IAsyncLifetime
         var userService = new Mock<IUserService>();
         var exerciseService = new ExerciseService(Handler.Context!, userService.Object);
 
-        var fisrtUser = CreateUserHelperAsync(firstUserId);
-        var secondUser = CreateUserHelperAsync(secondUserId);
-        var firstExercise = CreateExerciseHelperAsync(firstExId, firstUserId);
-        var secondExercise = CreateExerciseHelperAsync(secondExId, secondUserId);
+        await SeedUserAsync(firstUserId); // create the first user
+        await SeedUserAsync(secondUserId); // create the second user
+        await SeedExerciseAsync(firstExId, firstUserId); // create the first exerc. for first user
+        await SeedExerciseAsync(secondExId, secondUserId); // create the second exerc. for second user
 
         var result = await exerciseService.GetAllAsync(10);
-        Assert.True(result.Count == 1);
+        Assert.Single(result);
     }
 }

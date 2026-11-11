@@ -5,6 +5,7 @@ namespace overload.Data;
 
 public class MyContext : DbContext
 {
+    protected MyContext(){}
     public MyContext(DbContextOptions<MyContext> options)
         : base(options)
     {

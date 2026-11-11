@@ -7,11 +7,11 @@ using overload.Entities;
 using overload.Fixtures;
 using overload.Services;
 using overload.Services.Shared;
-using overload.Tests.TestUtils;
+using overload.Tests.Data;
 using overload.Utils;
 using BC = BCrypt.Net.BCrypt;
 
-namespace overload.Tests.Auth;
+namespace overload.Tests.ServicesTest;
 
 [Collection("Integration Test")]
 public class AuthServiceTest : IAsyncLifetime

@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using overload.Tests.TestUtils;
+using overload.Tests.Data;
 
 namespace overload.Fixtures;
 public class TestFixture : IAsyncDisposable

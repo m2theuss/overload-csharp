@@ -39,7 +39,7 @@ public class UserService(MyContext _myContext) : IUserService
         return Result<string>.OkWithMessage("Valid");
     }
     private Result<string> CheckForRegistrationConflicts(string username, string email){
-        var conflict = _myContext.users.Where((u => u.Username == username || u.Email == email))
+        var conflict = _myContext.users.Where(u => u.Username == username || u.Email == email)
                         .Select(u => new {u.Email, u.Username}).ToList();
 
         bool usernameExist = conflict.Any(u => u.Username == username);
