@@ -10,7 +10,7 @@ using overload.Services;
 using overload.Services.Shared;
 using overload.Tests.Common;
 using overload.Tests.Data;
-namespace overload.Tests.Routines;
+namespace overload.Tests.Services;
 
 [Collection("Integration Test")]
 public class RoutineServiceTest : IntegrationTestBase
@@ -43,5 +43,28 @@ public class RoutineServiceTest : IntegrationTestBase
         var result = await routineService.CreateRoutineAsync(100, new RoutineDto{});
 
         Assert.False(result.IsOk);
+    }
+
+    [Theory]
+    [InlineData(true,false,false,false)]
+    public void Should_FailToAddRoutineExercise_When_RoutineOrExerciseDoesNotExistOrHasAnotherOwner(
+        bool routineIsNull,
+        bool exerciseIsNull,
+        bool isRoutineAuthor,
+        bool isExerciseAuthor)
+    {
+        var userId = 10;
+        var otherUserId = 12;
+        var routineId = 13;
+        var dto = new RoutineExerciseDto{ExerciseId = 17};
+
+        Routine routine = null;
+        if(!routineIsNull) new Routine{Id = routineId, AuthorId = isRoutineAuthor ? userId : otherUserId};
+
+        Exercise exercise = null;
+        if(!exerciseIsNull) new Exercise{Id = dto.ExerciseId, AuthorId = isExerciseAuthor ? userId : otherUserId};
+
+        var exerciseServiceMock = new Mock<IExerciseService>().Setup(e => e.FindExerciseById(It.IsAny<int>())).Returns(Task.FromResult(exercise));
+        var routineServiceMock = new Mock<IRoutineService>().Setup(e => e.)
     }
 }

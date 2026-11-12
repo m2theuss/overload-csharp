@@ -14,7 +14,7 @@ using overload.Services;
 using overload.Services.Shared;
 using overload.Tests.Common;
 using overload.Tests.Data;
-namespace overload.Tests.ServicesTest;
+namespace overload.Tests.Services;
 
 [Collection("Integration Test")]
 public class ExerciseServiceTest : IntegrationTestBase

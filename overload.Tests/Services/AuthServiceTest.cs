@@ -11,7 +11,7 @@ using overload.Tests.Data;
 using overload.Utils;
 using BC = BCrypt.Net.BCrypt;
 
-namespace overload.Tests.ServicesTest;
+namespace overload.Tests.Services;
 
 [Collection("Integration Test")]
 public class AuthServiceTest : IAsyncLifetime

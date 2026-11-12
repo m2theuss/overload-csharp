@@ -29,7 +29,7 @@ public class UserService(MyContext _myContext) : IUserService
         }
         user.Password = BC.HashPassword(user.Password);
         _myContext.Add<User>(user);
-        if(await _myContext.SaveChangesAsync() == 0){ // less than 0 means that the update returns 0 affected rows...
+        if(!(await _myContext.SaveChangesAsync() > 0)){ // less than 0 means that the update returns 0 affected rows...
             return Result<string>.Error(
                 "Internal error",
                 "A error happen when try save the changes, try again or later",
