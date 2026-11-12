@@ -50,7 +50,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IExerciseService, ExerciseService>();
 builder.Services.AddScoped<IRoutineService, RoutineService>();
-builder.Services.AddScoped<JwtUtils>();
+builder.Services.AddScoped<IJwtUtils,JwtUtils>();
 var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization();

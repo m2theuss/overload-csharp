@@ -43,6 +43,7 @@ public class Result<T>
 }
 public enum ErrorCode
 {
+    Ok = 0,
     UsernameAlreadyExists,
     EmailAlreadyExists,
     UsernameOrEmailAlreadyExist,

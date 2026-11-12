@@ -14,7 +14,7 @@ public interface IAuthService{
     public Task<Result<string>> LoginAsync(UserDto userDto);
     public bool UserInfo();
 }
-public class AuthService(MyContext _myContext, JwtUtils _jwtUtils) : IAuthService{
+public class AuthService(MyContext _myContext, IJwtUtils _jwtUtils) : IAuthService{
 
     public async Task<Result<string>> LoginAsync(UserDto userDto){
         bool emailHasContent = !string.IsNullOrEmpty(userDto.Email);

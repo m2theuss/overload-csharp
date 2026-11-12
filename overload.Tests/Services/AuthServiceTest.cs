@@ -48,7 +48,7 @@ public class AuthServiceTest : IAsyncLifetime
     [Fact]
     public async Task Should_Login_When_UserCredentialsAreRight()
     {
-        var jwtMock = new Mock<JwtUtils>();
+        var jwtMock = new Mock<IJwtUtils>();
         jwtMock.Setup(e => e.generateJwtToken(It.IsAny<User>())).Returns("jwtRepresentation");
         AuthService service = new AuthService(Handler!.Context!, jwtMock.Object);
 

@@ -43,7 +43,7 @@ public abstract class IntegrationTestBase : IAsyncLifetime
         await Handler.Context.SaveChangesAsync();
         return user;
     }
-    protected User BuildUser(int id)
+    protected static User BuildUser(int id)
     {
         return new User
         {
@@ -62,7 +62,7 @@ public abstract class IntegrationTestBase : IAsyncLifetime
         Exercise exercise = new()
         {
             Id = exerciseId,
-            Name = "Biceps",
+            Name = "Test seed exercise",
             Muscle = TargetMuscle.Back,
             Type = ExerciseType.Cable,
             AuthorId = authorId,
@@ -73,16 +73,33 @@ public abstract class IntegrationTestBase : IAsyncLifetime
         return exercise;
     }
     
-    protected Exercise BuildExercise(int exerciseId, int authorId)
+    protected static Exercise BuildExercise(int exerciseId, int authorId)
     {
         return new Exercise
         {
             Id = exerciseId,
-            Name = "Biceps",
+            Name = "Test exercise",
             Muscle = TargetMuscle.Back,
             Type = ExerciseType.Cable,
             AuthorId = authorId,
             IsPublic = false
         };
     }
+
+    protected async Task<Routine> SeedRoutineAsync(int id, int authorId)
+    {
+        var routine = new Routine
+        {
+            Id = id,
+            Name = "Test seed Routine",
+            Day = System.DayOfWeek.Monday,
+            IsPublic = true,
+            AuthorId = authorId
+        };
+
+        Handler.Context!.routines.Add(routine);
+        await Handler.Context.SaveChangesAsync();
+        return routine;
+    }
+    
 }

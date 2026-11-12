@@ -1,4 +1,5 @@
 using System.Net.NetworkInformation;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -47,24 +48,109 @@ public class RoutineServiceTest : IntegrationTestBase
 
     [Theory]
     [InlineData(true,false,false,false)]
-    public void Should_FailToAddRoutineExercise_When_RoutineOrExerciseDoesNotExistOrHasAnotherOwner(
+    [InlineData(false,true,false,false)]
+    [InlineData(false,false,true,false)]
+    [InlineData(false,false,false,true)]
+    public async Task Should_FailToAddRoutineExerciseAsync_When_RoutineOrExerciseDoesNotExistOrHasAnotherOwner(
         bool routineIsNull,
         bool exerciseIsNull,
-        bool isRoutineAuthor,
-        bool isExerciseAuthor)
+        bool isRoutineFromAnotherUser,
+        bool isExerciseFromAnotherUser
+    )
     {
-        var userId = 10;
-        var otherUserId = 12;
-        var routineId = 13;
-        var dto = new RoutineExerciseDto{ExerciseId = 17};
+        //numbersId are random
+        int routineId = 10;
+        int authorId = 11;
+        int otherUserId = 20;
+        int exerciseId = 15;
+        int userId = 20;
 
-        Routine routine = null;
-        if(!routineIsNull) new Routine{Id = routineId, AuthorId = isRoutineAuthor ? userId : otherUserId};
+        Routine? routine = null;
+        if(!routineIsNull) routine = new Routine{Id = routineId, AuthorId = isRoutineFromAnotherUser ? authorId : otherUserId}; 
+        Exercise? exercise = null;
+        if(!exerciseIsNull) exercise = new Exercise{Id = exerciseId, AuthorId = isExerciseFromAnotherUser ? authorId : otherUserId}; 
 
-        Exercise exercise = null;
-        if(!exerciseIsNull) new Exercise{Id = dto.ExerciseId, AuthorId = isExerciseAuthor ? userId : otherUserId};
+        var exerciseServiceMock = new Mock<IExerciseService>();
+        exerciseServiceMock.Setup(e => e.FindExerciseById(It.IsAny<int>())).Returns(Task.FromResult(exercise));
+        
+        var userServiceMock = new Mock<IUserService>();
+        
+        if(!(routineIsNull && exerciseIsNull)) // I could used just the routineIsNull check or exerciseIsNull check, but, to be more readble i prefer use both
+        {
+            await SeedUserAsync(authorId);
+            await SeedRoutineAsync(routineId, authorId);
+        }
+        
 
-        var exerciseServiceMock = new Mock<IExerciseService>().Setup(e => e.FindExerciseById(It.IsAny<int>())).Returns(Task.FromResult(exercise));
-        var routineServiceMock = new Mock<IRoutineService>().Setup(e => e.)
+        var routineService = new RoutineService(Handler.Context!, exerciseServiceMock.Object, userServiceMock.Object);
+        var result = await routineService.AddRoutineExerciseAsync(new RoutineExerciseDto(), routineId, userId);
+
+        Assert.False(result.IsOk);
+        Assert.Equal(ErrorCode.NotFound, result.Code);
+    }
+    
+    [Fact]
+    public async Task Should_ReturnDataConflictError_When_SentDataAlmostExistsInDatabase()
+    {
+        int authorId = 10;
+        int exerciseId = 11;
+        int routineId = 15;
+        await SeedUserAsync(authorId);
+        var seedExerciseResult = await SeedExerciseAsync(exerciseId, authorId);
+        await SeedRoutineAsync(routineId, authorId);
+
+        var exerciseServiceMock = new Mock<IExerciseService>();
+        exerciseServiceMock.Setup(e => e.FindExerciseById(It.IsAny<int>())).Returns(Task.FromResult(seedExerciseResult)!);
+        var userServiceMock = new Mock<IUserService>();
+        var routineService = new RoutineService(Handler.Context!,exerciseServiceMock.Object, userServiceMock.Object);
+
+
+        var firstSave = await routineService.AddRoutineExerciseAsync(new RoutineExerciseDto{ExerciseId = exerciseId},routineId, authorId);
+        var secondFailureSave = await routineService.AddRoutineExerciseAsync(new RoutineExerciseDto{ExerciseId = exerciseId},routineId, authorId);
+        Assert.False(secondFailureSave.IsOk);
+        Assert.Equal(ErrorCode.DataConflict, secondFailureSave.Code);
+    }
+    
+    [Fact]
+    public async Task Should_ReturnDatabaseFailure_When_ErrorsOcorrsWhileSaving()
+    {
+        int authorId = 10;
+        int exerciseId = 11;
+        int routineId = 15;
+        await SeedUserAsync(authorId);
+        var seedExerciseResult = await SeedExerciseAsync(exerciseId, authorId);
+        await SeedRoutineAsync(routineId, authorId);
+
+        var exerciseServiceMock = new Mock<IExerciseService>();
+        exerciseServiceMock.Setup(e => e.FindExerciseById(It.IsAny<int>())).Returns(Task.FromResult(seedExerciseResult)!);
+        var userServiceMock = new Mock<IUserService>();
+        var fakeContext = new FailMyContext(Handler.Options!);
+        var routineService = new RoutineService(fakeContext,exerciseServiceMock.Object, userServiceMock.Object);
+
+
+        var result = await routineService.AddRoutineExerciseAsync(new RoutineExerciseDto{ExerciseId = exerciseId},routineId, authorId);
+        Assert.False(result.IsOk);
+        Assert.Equal(ErrorCode.DatabaseSaveFailure, result.Code);
+    }
+
+    [Fact]
+    public async Task Should_ReturnOk_When_RoutineExerciseHasBeenSavedInDatabase()
+    {
+        int authorId = 10;
+        int exerciseId = 11;
+        int routineId = 15;
+        await SeedUserAsync(authorId);
+        var seedExerciseResult = await SeedExerciseAsync(exerciseId, authorId);
+        await SeedRoutineAsync(routineId, authorId);
+
+        var exerciseServiceMock = new Mock<IExerciseService>();
+        exerciseServiceMock.Setup(e => e.FindExerciseById(It.IsAny<int>())).Returns(Task.FromResult(seedExerciseResult)!);
+        var userServiceMock = new Mock<IUserService>();
+        var routineService = new RoutineService(Handler.Context!,exerciseServiceMock.Object, userServiceMock.Object);
+
+
+        var result = await routineService.AddRoutineExerciseAsync(new RoutineExerciseDto{ExerciseId = exerciseId},routineId, authorId);
+        Assert.True(result.IsOk);
+        Assert.Equal(ErrorCode.Ok, result.Code);
     }
 }

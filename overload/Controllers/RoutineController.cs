@@ -22,10 +22,10 @@ public class RoutineController(IRoutineService _routineService) : ControllerBase
 
     //add a exercise into a routine
     [HttpPost("{routineId}/exercises")]
-    public async Task<ActionResult> AddRoutineExercise([FromBody] RoutineExerciseDto dto, int routineId) // add a exercise into a routine
+    public async Task<ActionResult> AddRoutineExerciseAsync([FromBody] RoutineExerciseDto dto, int routineId) // add a exercise into a routine
     {
         UserHasValidId(out int authorId);
-        var result = await _routineService.AddRoutineExercise(dto, routineId, authorId);
+        var result = await _routineService.AddRoutineExerciseAsync(dto, routineId, authorId);
         return result.IsOk ? Ok(result.Message) : BadRequest(result.Message);
 
     }

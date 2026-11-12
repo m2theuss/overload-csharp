@@ -11,7 +11,7 @@ namespace overload.Services;
 public interface IRoutineService
 {
     public Task<Result<string>> CreateRoutineAsync(int authorId, RoutineDto routineDto);
-    public Task<Result<string>> AddRoutineExercise(RoutineExerciseDto dto, int routineId, int userId);
+    public Task<Result<string>> AddRoutineExerciseAsync(RoutineExerciseDto dto, int routineId, int userId);
     public ICollection<Routine> GetAllById(int userId);
 }
 public class RoutineService(MyContext _myContext, IExerciseService _exerciseService, IUserService userService) : IRoutineService
@@ -36,10 +36,10 @@ public class RoutineService(MyContext _myContext, IExerciseService _exerciseServ
         }
         return Result<string>.Error("Database problem", "A error happen when try save the changes", ErrorCode.DatabaseSaveFailure);
     }
-    public async Task<Result<string>> AddRoutineExercise(RoutineExerciseDto dto, int routineId, int userId)
+    public async Task<Result<string>> AddRoutineExerciseAsync(RoutineExerciseDto dto, int routineId, int userId)
     {
-        Exercise? exercise = await _exerciseService.FindExerciseById(dto.ExerciseId);
         Routine? routine = await FindRoutineById(routineId);
+        Exercise? exercise = await _exerciseService.FindExerciseById(dto.ExerciseId);
 
         if (routine == null || exercise == null || routine.AuthorId != userId || exercise.AuthorId != userId)
         {
@@ -92,7 +92,7 @@ public class RoutineService(MyContext _myContext, IExerciseService _exerciseServ
     {
         var result = await _myContext.routine_exercises.FirstOrDefaultAsync(e => e.RoutineId == newRoutineExercise.RoutineId
             && e.ExerciseId == newRoutineExercise.ExerciseId);
-        return result != null ? true : false;
+        return result != null;
     }
     public ICollection<Routine> GetAllById(int userId)
     {
