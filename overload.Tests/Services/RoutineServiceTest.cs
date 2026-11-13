@@ -16,7 +16,21 @@ namespace overload.Tests.Services;
 [Collection("Integration Test")]
 public class RoutineServiceTest : IntegrationTestBase
 {
-    public RoutineServiceTest(TestFixture fixture) : base(fixture){}
+    private readonly Mock<IExerciseService> _exerciseServiceMock = new();
+    private readonly Mock<IUserService> _userServiceMock = new();
+    private readonly Mock<IRoutineExerciseService> _routineExerciseServiceMock = new();
+    private readonly RoutineService _sut; 
+    
+
+    public RoutineServiceTest(TestFixture fixture) : base(fixture)
+    {
+        _sut = new RoutineService(
+            Handler.Context!,
+            _exerciseServiceMock.Object,
+            _userServiceMock.Object,
+            _routineExerciseServiceMock.Object
+        );
+    }
     [Fact]
     public async Task Should_FailCreateRoutine_When_UserIdWasNotFound()
     {
@@ -30,6 +44,22 @@ public class RoutineServiceTest : IntegrationTestBase
 
         Assert.False(result.IsOk);
         Assert.Equal(ErrorCode.NotFound, result.Code);
+    }
+
+    [Fact]
+    public async Task Should_FailCreateRoutine_When_RoutineNameAlmostExist()
+    {
+        int authorId = 1;
+        int exerciseId = 5;
+        var routineDto = new RoutineDto();
+        await SeedUserAsync(authorId);
+        await SeedExerciseAsync(exerciseId, authorId);
+
+        await _sut.CreateRoutineAsync(authorId, routineDto); // this will save the routine and have sucess
+        var failRound = await _sut.CreateRoutineAsync(authorId, routineDto); // this will try to save the same again, and must fail with NameConflict
+
+        Assert.Equal(ErrorCode.NameConflict, failRound.Code);
+        Assert.False(failRound.IsOk);
     }
 
     [Fact]

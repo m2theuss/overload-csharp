@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using overload.DTOs;
@@ -7,6 +8,7 @@ using overload.Entities;
 using overload.Fixtures;
 using overload.Services;
 using overload.Services.Shared;
+using overload.Tests.Common;
 using overload.Tests.Data;
 using overload.Utils;
 using BC = BCrypt.Net.BCrypt;
@@ -14,24 +16,12 @@ using BC = BCrypt.Net.BCrypt;
 namespace overload.Tests.Services;
 
 [Collection("Integration Test")]
-public class AuthServiceTest : IAsyncLifetime
+public class AuthServiceTest : IntegrationTestBase
 {
-    private AsyncServiceScope _scope; //this allow that each test have a clean context handler and be able to use dispose on that
-    private IContextHandler? Handler{get;set;}
-    public AuthServiceTest(TestFixture fixture)
-    {
-        _scope = fixture.Provider.CreateAsyncScope();
-        Handler = _scope.ServiceProvider.GetRequiredService<IContextHandler>(); //when i call Icontext... inside the fixture this give me a non interface Context class
-    }
-    public async Task InitializeAsync()
-    {
-        await _scope.DisposeAsync();
-        await Handler!.InitializeContextAsync();
-    }
-    public async Task DisposeAsync()
-    {
-        await Handler!.DisposeAsync();
-    }
+    public AuthServiceTest(TestFixture fixture) : base(fixture){}
+    private const string validEmail = "email@test.com";
+    private const string validUsername = "username";
+    private const string emptyValue = "";
     
     [Fact]
     public async Task Should_FailLoginUser_When_BothUsernameAndEmailAreSubmited()
@@ -45,20 +35,24 @@ public class AuthServiceTest : IAsyncLifetime
         Assert.Equal(ErrorCode.InvalidData,result.Code);
     }
 
-    [Fact]
-    public async Task Should_Login_When_UserCredentialsAreRight()
+    [Theory]
+    [InlineData(validEmail,emptyValue)]
+    [InlineData(emptyValue, validUsername)]
+    public async Task Should_LoginUsingEmailOrUsername_When_CredentialsAreRight(string emailOrEmpty, string usernameOrEmpty)
     {
         var jwtMock = new Mock<IJwtUtils>();
         jwtMock.Setup(e => e.generateJwtToken(It.IsAny<User>())).Returns("jwtRepresentation");
         AuthService service = new AuthService(Handler!.Context!, jwtMock.Object);
 
-        UserDto dto = GenerateUserDto("username", string.Empty /*here must be empty*/, "password");
-        User user = GenerateUser(dto.Username, "myemail@com.br", dto.Password); //inside this method the password is encoded using bcript;
+        UserDto dto = GenerateUserDto(usernameOrEmpty, emailOrEmpty, "password");
+        User user = GenerateUser(validUsername, validEmail, dto.Password); //inside this method the password is encoded using bcript;
 
         Handler!.Context!.users.Add(user);
         await Handler.Context.SaveChangesAsync();
         
         var result = await service.LoginAsync(dto);
+        //Assert.True(result.IsOk);
+        Assert.Equal(ErrorCode.Ok,result.Code);
         Assert.Equal("jwtRepresentation",result.Data);
     }
     private static UserDto GenerateUserDto(string username, string email, string password)

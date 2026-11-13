@@ -20,6 +20,7 @@ public abstract class IntegrationTestBase : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await Handler.InitializeContextAsync();
+        
     }
 
     public async Task DisposeAsync()
