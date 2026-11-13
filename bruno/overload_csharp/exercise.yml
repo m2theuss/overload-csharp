@@ -1,0 +1,28 @@
+info:
+  name: exercise
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: localhost:5071/api/exercises
+  headers:
+    - name: Authorization
+      value: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEzIiwidXNlcm5hbWUiOiJqb3dobmRvZTEyMzMyIiwibmJmIjoxNzk0NTgwMjc2LCJleHAiOjE3OTQ1ODM4NzYsImlhdCI6MTc5NDU4MDI3Nn0._WeB5iH0mfrjSiH6gWpOr1yPrvf_O0CUf4CreS_7nRE
+  body:
+    type: json
+    data: |-
+      {
+        "name": "pres chess",
+        "muscle": "Chest",
+        "type": "Machine",
+        "isPublic": true
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

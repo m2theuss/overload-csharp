@@ -1,7 +1,7 @@
 info:
   name: exercise all
   type: http
-  seq: 6
+  seq: 4
 
 http:
   method: GET

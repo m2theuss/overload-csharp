@@ -1,7 +1,7 @@
 info:
   name: routines all
   type: http
-  seq: 8
+  seq: 7
 
 http:
   method: GET

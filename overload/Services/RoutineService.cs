@@ -23,6 +23,10 @@ public class RoutineService(MyContext myContext, IExerciseService exerciseServic
         {
             return Result<string>.Error("User not found", "The send id of user was note found", ErrorCode.NotFound);
         }
+        if(!await IsRoutineNameAvailableAsync(routineDto.Name!))
+        {
+            return Result<string>.Error("Name conflict", "Almost have a routine with that name", ErrorCode.NameConflict);
+        }
         Routine routineExercise = new Routine
         {
             Name = routineDto.Name,
@@ -88,6 +92,10 @@ public class RoutineService(MyContext myContext, IExerciseService exerciseServic
         newRoutineExercise.Order = replacedOrderRoutine.Order;
         replacedOrderRoutine.Order = ++amount;
         await myContext.SaveChangesAsync();
+    }
+    private async Task<bool> IsRoutineNameAvailableAsync(string exerciseName)
+    {
+        return (await myContext.routines.FirstOrDefaultAsync(e => e.Name == exerciseName)) == null;
     }
     private async Task<bool> IsAlreadyRegistred(RoutineExercise newRoutineExercise)
     {

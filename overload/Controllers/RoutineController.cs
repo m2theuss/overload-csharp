@@ -14,10 +14,22 @@ public class RoutineController(IRoutineService _routineService) : ControllerBase
 {
     [Authorize]
     [HttpPost]
-    public async Task Create(RoutineDto routineDto)
+    public async Task<IActionResult> Create(RoutineDto routineDto)
     {
         UserHasValidId(out int userId);
-        await _routineService.CreateRoutineAsync(userId, routineDto);
+        var result = await _routineService.CreateRoutineAsync(userId, routineDto);
+        int integerCode = result.Code switch{
+            ErrorCode.Ok => 200,
+            ErrorCode.DatabaseSaveFailure => 500,
+            ErrorCode.NotFound => 404,
+            ErrorCode.NameConflict => 409,
+            _ => 500
+        };
+        return Problem(
+            detail: result.Message,
+            title: result.Title,
+            statusCode: integerCode
+        );
     }
 
     [Authorize]

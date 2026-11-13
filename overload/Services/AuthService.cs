@@ -22,16 +22,17 @@ public class AuthService(MyContext _myContext, IJwtUtils _jwtUtils) : IAuthServi
         if((emailHasContent && usernameHasContent) || (!emailHasContent && !usernameHasContent)){
             return Result<string>.Error("Conflict","Please provinder either a e-mail or username",ErrorCode.InvalidData);
         }
-        User? result;
+        User? userResult;
         if(emailHasContent){
-            result = await _myContext.users.FirstOrDefaultAsync(e => e.Email == userDto.Email || e.Username == userDto.Username);
+            Console.Write(userDto.Email);
+            userResult = await _myContext.users.FirstOrDefaultAsync(e => e.Email == userDto.Email);
         }else{
-            result = await _myContext.users.FirstOrDefaultAsync(e => e.Username == userDto.Username);
+            userResult = await _myContext.users.FirstOrDefaultAsync(e => e.Username == userDto.Username);
         }
 
-        if(result != null){
-            if(BC.Verify(userDto.Password, result.Password)){
-                var generatedToken = _jwtUtils.generateJwtToken(result);
+        if(userResult != null){
+            if(BC.Verify(userDto.Password, userResult.Password)){
+                var generatedToken = _jwtUtils.generateJwtToken(userResult);
                 if(generatedToken != null)
                 {
                     return Result<string>.OkWithData(generatedToken);

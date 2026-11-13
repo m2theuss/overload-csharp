@@ -8,7 +8,7 @@ http:
   url: localhost:5071/api/user/info
   headers:
     - name: Authorization
-      value: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEwIiwidXNlcm5hbWUiOiJqb2huZG9lMTIzMzIiLCJuYmYiOjE3OTQ1MzAxMTQsImV4cCI6MTc5NDUzMzcxNCwiaWF0IjoxNzk0NTMwMTE0fQ.rGwdeqVHh8HY4x6xwuymwb29rjGEuZRgv1X_9hsm6vg
+      value: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEzIiwidXNlcm5hbWUiOiJqb3dobmRvZTEyMzMyIiwibmJmIjoxNzk0NTc4NjA5LCJleHAiOjE3OTQ1ODIyMDksImlhdCI6MTc5NDU3ODYwOX0.EgV9RxFJWdZcP5KV1aaX3SbMtTmwyqtYr20U4Y4ol0k
   body:
     type: json
     data: |
