@@ -1,3 +1,5 @@
 rewrite the services to handle and validate fields empty etc.
 write exceptions to handle with "random" errors
 add caching to get things like routines or exercises most common
+
+write other table to be able to making something like weight peer each exercise

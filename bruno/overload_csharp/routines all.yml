@@ -5,10 +5,10 @@ info:
 
 http:
   method: GET
-  url: localhost:5071/api/routines/users/10/routines
+  url: localhost:5071/api/routines/9/exercises
   headers:
     - name: Authorization
-      value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEwIiwidXNlcm5hbWUiOiJqb2huZG9lMTIzMzIiLCJuYmYiOjE3OTM4MzcxNTMsImV4cCI6MTc5Mzg0MDc1MywiaWF0IjoxNzkzODM3MTUzfQ.Y6fhjm6S5srrsJCF5bA4EAKvBX5wY5F7zVrWe7Lyd-w
+      value: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEwIiwidXNlcm5hbWUiOiJqb2huZG9lMTIzMzIiLCJuYmYiOjE3OTQ1MzAxMTQsImV4cCI6MTc5NDUzMzcxNCwiaWF0IjoxNzk0NTMwMTE0fQ.rGwdeqVHh8HY4x6xwuymwb29rjGEuZRgv1X_9hsm6vg
   auth: inherit
 
 settings:

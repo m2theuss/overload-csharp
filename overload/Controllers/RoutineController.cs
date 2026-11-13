@@ -20,6 +20,7 @@ public class RoutineController(IRoutineService _routineService) : ControllerBase
         await _routineService.CreateRoutineAsync(userId, routineDto);
     }
 
+    [Authorize]
     //add a exercise into a routine
     [HttpPost("{routineId}/exercises")]
     public async Task<ActionResult> AddRoutineExerciseAsync([FromBody] RoutineExerciseDto dto, int routineId) // add a exercise into a routine
@@ -43,11 +44,20 @@ public class RoutineController(IRoutineService _routineService) : ControllerBase
             return false;
         }
     }
+
     [Authorize]
     [HttpGet()]
-    public ActionResult<ICollection<Routine>> GetAllRoutinesById()
+    public async Task<ActionResult<ICollection<Routine>>> GetAllRoutinesById()
     {
         UserHasValidId(out int userId);
-        return Ok(_routineService.GetAllById(userId));
+        return Ok(await _routineService.GetAllByIdAsync(userId));
     } 
+
+    [Authorize]
+    [HttpGet("{routineId}/exercises")]
+    public async Task<Result<ICollection<RoutineExerciseDto>>> GetExercisesByRoutineId(int routineId)
+    {
+        UserHasValidId(out int userId);
+        return await _routineService.GetExerciseByRoutineIdAsync(userId, routineId); // keep on here, for some reason dont return anyvalue
+    }
 }

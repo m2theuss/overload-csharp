@@ -6,6 +6,8 @@ public class RoutineExercise
 {
     public int Id{get;set;}
     public int Order{get;set;}
+    public int Sets{get;set;}
+    public int Reps{get;set;}
     public int RoutineId{get;set;}
     public Routine? Routine{get;set;}
     public int ExerciseId{get;set;}

@@ -24,7 +24,8 @@ public class RoutineServiceTest : IntegrationTestBase
         var userService = new Mock<IUserService>();
         userService.Setup(u => u.FindUserById(It.IsAny<int>())).Returns((User?)null);
 
-        RoutineService routineService = new RoutineService(Handler.Context!, exerciseService.Object, userService.Object);
+        var routineExerciseService = new Mock<IRoutineExerciseService>();
+        RoutineService routineService = new RoutineService(Handler.Context!, exerciseService.Object, userService.Object, routineExerciseService.Object);
         var result = await routineService.CreateRoutineAsync(100, new RoutineDto{});
 
         Assert.False(result.IsOk);
@@ -40,7 +41,8 @@ public class RoutineServiceTest : IntegrationTestBase
 
         userServiceMock.Setup(u => u.FindUserById(It.IsAny<int>())).Returns(new User{Id = 1});
 
-        RoutineService routineService = new RoutineService(fakeContext, exerciseServiceMock.Object, userServiceMock.Object);
+        var routineExerciseService = new Mock<IRoutineExerciseService>();
+        RoutineService routineService = new RoutineService(fakeContext, exerciseServiceMock.Object, userServiceMock.Object, routineExerciseService.Object);
         var result = await routineService.CreateRoutineAsync(100, new RoutineDto{});
 
         Assert.False(result.IsOk);
@@ -81,8 +83,8 @@ public class RoutineServiceTest : IntegrationTestBase
             await SeedRoutineAsync(routineId, authorId);
         }
         
-
-        var routineService = new RoutineService(Handler.Context!, exerciseServiceMock.Object, userServiceMock.Object);
+        var routineExerciseService = new Mock<IRoutineExerciseService>();
+        var routineService = new RoutineService(Handler.Context!, exerciseServiceMock.Object, userServiceMock.Object, routineExerciseService.Object);
         var result = await routineService.AddRoutineExerciseAsync(new RoutineExerciseDto(), routineId, userId);
 
         Assert.False(result.IsOk);
@@ -102,7 +104,8 @@ public class RoutineServiceTest : IntegrationTestBase
         var exerciseServiceMock = new Mock<IExerciseService>();
         exerciseServiceMock.Setup(e => e.FindExerciseById(It.IsAny<int>())).Returns(Task.FromResult(seedExerciseResult)!);
         var userServiceMock = new Mock<IUserService>();
-        var routineService = new RoutineService(Handler.Context!,exerciseServiceMock.Object, userServiceMock.Object);
+        var routineExerciseService = new Mock<IRoutineExerciseService>();
+        var routineService = new RoutineService(Handler.Context!,exerciseServiceMock.Object, userServiceMock.Object, routineExerciseService.Object);
 
 
         var firstSave = await routineService.AddRoutineExerciseAsync(new RoutineExerciseDto{ExerciseId = exerciseId},routineId, authorId);
@@ -125,7 +128,8 @@ public class RoutineServiceTest : IntegrationTestBase
         exerciseServiceMock.Setup(e => e.FindExerciseById(It.IsAny<int>())).Returns(Task.FromResult(seedExerciseResult)!);
         var userServiceMock = new Mock<IUserService>();
         var fakeContext = new FailMyContext(Handler.Options!);
-        var routineService = new RoutineService(fakeContext,exerciseServiceMock.Object, userServiceMock.Object);
+        var routineExerciseService = new Mock<IRoutineExerciseService>();
+        var routineService = new RoutineService(fakeContext,exerciseServiceMock.Object, userServiceMock.Object, routineExerciseService.Object);
 
 
         var result = await routineService.AddRoutineExerciseAsync(new RoutineExerciseDto{ExerciseId = exerciseId},routineId, authorId);
@@ -146,7 +150,8 @@ public class RoutineServiceTest : IntegrationTestBase
         var exerciseServiceMock = new Mock<IExerciseService>();
         exerciseServiceMock.Setup(e => e.FindExerciseById(It.IsAny<int>())).Returns(Task.FromResult(seedExerciseResult)!);
         var userServiceMock = new Mock<IUserService>();
-        var routineService = new RoutineService(Handler.Context!,exerciseServiceMock.Object, userServiceMock.Object);
+        var routineExerciseService = new Mock<IRoutineExerciseService>();
+        var routineService = new RoutineService(Handler.Context!,exerciseServiceMock.Object, userServiceMock.Object, routineExerciseService.Object);
 
 
         var result = await routineService.AddRoutineExerciseAsync(new RoutineExerciseDto{ExerciseId = exerciseId},routineId, authorId);

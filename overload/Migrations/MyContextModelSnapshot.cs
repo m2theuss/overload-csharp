@@ -39,7 +39,13 @@ namespace overload_csharp.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("integer");
 
+                    b.Property<int>("Reps")
+                        .HasColumnType("integer");
+
                     b.Property<int>("RoutineId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Sets")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
