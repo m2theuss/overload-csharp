@@ -1,0 +1,22 @@
+info:
+  name: exer. routine by id
+  type: http
+  seq: 9
+
+http:
+  method: GET
+  url: localhost:5071/api/routines/9/exercises
+  headers:
+    - name: Authorization
+      value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE3IiwidXNlcm5hbWUiOiJqb3dobmRvZTEyMzMyIiwibmJmIjoxNzk0NjEyODI4LCJleHAiOjE3OTQ2MTY0MjgsImlhdCI6MTc5NDYxMjgyOH0.ipTy2ppybZOZOvKlD4rbSXOiQTTT-e4ho1ygaKQNJ30
+  body:
+    type: json
+    data: ""
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

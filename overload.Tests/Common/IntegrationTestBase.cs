@@ -17,7 +17,7 @@ public abstract class IntegrationTestBase : IAsyncLifetime
         Handler = _scope.ServiceProvider.GetRequiredService<IContextHandler>();
     }
 
-    public async Task InitializeAsync()
+    public virtual async Task InitializeAsync()
     {
         await Handler.InitializeContextAsync();
         

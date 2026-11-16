@@ -1,7 +1,9 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace overload.DTOs.Routines;
 
-public class RoutineExerciseDto
-{
+public class RoutineExerciseDtoResponse
+{    
     public int Id { get; set; }
     public int ExerciseId { get; set; }
     public string ExerciseName { get; set; } = string.Empty;

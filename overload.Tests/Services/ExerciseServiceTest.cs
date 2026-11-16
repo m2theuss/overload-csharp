@@ -46,7 +46,7 @@ public class ExerciseServiceTest : IntegrationTestBase
             IsPublic = true
         };
         var result = await service.CreateAsync(USER_ID, exerciseDto);
-        Assert.True(result.IsOk, $"The message of the error is: {result.Message}");
+        Assert.True(result.IsOk, $"The message of the error is: {result.Detail}");
     }
 
     [Fact]
@@ -99,7 +99,7 @@ public class ExerciseServiceTest : IntegrationTestBase
         };
         Handler.Context!.ChangeTracker.Clear();
         var result = await exercise.UpdateAsync(exerciseItem.Id, updatedExercise,author.Id);
-        Assert.True(result.IsOk, $"The error follows: {result.Message}");
+        Assert.True(result.IsOk, $"The error follows: {result.Detail}");
     }
     [Fact]
     public async Task Shoud_FailUpdateExercise_When_UserIsNotTheAuthor()
@@ -123,7 +123,7 @@ public class ExerciseServiceTest : IntegrationTestBase
         };
         Handler.Context!.ChangeTracker.Clear();
         var result = await exerciseService.UpdateAsync(EXERC_ID, updatedExercise,USER_IMPOSTOR);
-        Assert.False(result.IsOk, $"The error follows: {result.Message}");
+        Assert.False(result.IsOk, $"The error follows: {result.Detail}");
     }
     [Fact]
     public async Task Should_FailUpdate_When_ExerciseWasNotFound()

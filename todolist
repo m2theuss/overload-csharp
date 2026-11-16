@@ -1,5 +1,11 @@
 rewrite the services to handle and validate fields empty etc.
 write exceptions to handle with "random" errors
-add caching to get things like routines or exercises most common
+add cache to get things like routines or exercises most common
 
 write other table to be able to making something like weight peer each exercise
+implement the 2 steps jwt, one with a long duration token and other with 5 minutes token
+
+
+routines:
+    to remove a routine you must sure that all your relations have been removed to, bc otherwise will have a    
+        error of foreing key

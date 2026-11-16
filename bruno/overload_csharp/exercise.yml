@@ -1,20 +1,20 @@
 info:
   name: exercise
   type: http
-  seq: 6
+  seq: 4
 
 http:
   method: POST
   url: localhost:5071/api/exercises
   headers:
     - name: Authorization
-      value: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEzIiwidXNlcm5hbWUiOiJqb3dobmRvZTEyMzMyIiwibmJmIjoxNzk0NTgwMjc2LCJleHAiOjE3OTQ1ODM4NzYsImlhdCI6MTc5NDU4MDI3Nn0._WeB5iH0mfrjSiH6gWpOr1yPrvf_O0CUf4CreS_7nRE
+      value: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE5IiwidXNlcm5hbWUiOiJqb3dobmRvZTEyMzMyIiwibmJmIjoxNzk0NjU4NzQyLCJleHAiOjE3OTQ2NjIzNDIsImlhdCI6MTc5NDY1ODc0Mn0.bFHhjFbHe8qd46Tpe5V1FYR1s55EjIIjBErGy5WDmMk
   body:
     type: json
     data: |-
       {
-        "name": "pres chess",
-        "muscle": "Chest",
+        "name": "hack machine",
+        "muscle": "Quads",
         "type": "Machine",
         "isPublic": true
       }

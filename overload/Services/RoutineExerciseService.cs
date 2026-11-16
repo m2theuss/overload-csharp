@@ -8,18 +8,18 @@ namespace overload.Services;
 
 public interface IRoutineExerciseService
 {
-    public Task<Result<ICollection<RoutineExerciseDto>>> FindAllExercisesFromRoutineAsync(int routineId, int userId, CancellationToken cancellationToken = default);
+    public Task<Result<ICollection<RoutineExerciseDtoResponse>>> FindAllExercisesFromRoutineAsync(int routineId, int userId, CancellationToken cancellationToken = default);
 }
 public class RoutineExerciseService(MyContext myContext) : IRoutineExerciseService
 {
-    public async Task<Result<ICollection<RoutineExerciseDto>>> FindAllExercisesFromRoutineAsync(int routineId, int userId, CancellationToken cancellationToken = default)
+    public async Task<Result<ICollection<RoutineExerciseDtoResponse>>> FindAllExercisesFromRoutineAsync(int routineId, int userId, CancellationToken cancellationToken = default)
     {
         var result = await myContext.routine_exercises.AsNoTracking().
-            Where(e => e.RoutineId == routineId || e.ExerciseItem!.AuthorId == userId).
+            Where(e => e.RoutineId == routineId && e.Routine!.AuthorId == userId).OrderBy(e => e.Order).
             Select(e => 
-                new RoutineExerciseDto
+                new RoutineExerciseDtoResponse
                 {
-                    Id = e.Id, 
+                    Id = e.Id,  
                     ExerciseId = e.ExerciseId, 
                     ExerciseName = e.ExerciseItem!.Name,
                     Order = e.Order,
@@ -27,8 +27,8 @@ public class RoutineExerciseService(MyContext myContext) : IRoutineExerciseServi
                     Reps = e.Reps
                 }
         ).ToListAsync(cancellationToken);
-        return result.Count == 0 ? Result<ICollection<RoutineExerciseDto>>.Error("Not Found", "Any routines exercise was find",ErrorCode.NotFound)
-            : Result<ICollection<RoutineExerciseDto>>.OkWithData(result);
+        return result.Count <= 0 ? Result<ICollection<RoutineExerciseDtoResponse>>.Error("Not Found", "Routine id was not found", ErrorCode.NotFound)
+            : Result<ICollection<RoutineExerciseDtoResponse>>.OkWithData(result);
 
     }
 }

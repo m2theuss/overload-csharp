@@ -1,0 +1,22 @@
+info:
+  name: exercise by id
+  type: http
+  seq: 10
+
+http:
+  method: DELETE
+  url: localhost:5071/api/exercises/23
+  headers:
+    - name: Authorization
+      value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE5IiwidXNlcm5hbWUiOiJqb3dobmRvZTEyMzMyIiwibmJmIjoxNzk0Nzg2ODc2LCJleHAiOjE3OTQ3OTA0NzYsImlhdCI6MTc5NDc4Njg3Nn0.5NcMhRclaBLb1bKBskNIUnLMuGacWiDgF216qhYNC74
+  body:
+    type: json
+    data: ""
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

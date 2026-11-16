@@ -1,19 +1,19 @@
 info:
   name: routine
   type: http
-  seq: 8
+  seq: 7
 
 http:
   method: POST
   url: localhost:5071/api/routines
   headers:
     - name: Authorization
-      value: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEzIiwidXNlcm5hbWUiOiJqb3dobmRvZTEyMzMyIiwibmJmIjoxNzk0NTgwMjc2LCJleHAiOjE3OTQ1ODM4NzYsImlhdCI6MTc5NDU4MDI3Nn0._WeB5iH0mfrjSiH6gWpOr1yPrvf_O0CUf4CreS_7nRE
+      value: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE5IiwidXNlcm5hbWUiOiJqb3dobmRvZTEyMzMyIiwibmJmIjoxNzk0NjE2MTQ2LCJleHAiOjE3OTQ2MTk3NDYsImlhdCI6MTc5NDYxNjE0Nn0.SD4S2LYX9EyDEgFEvkyQuJ7NktD2dPAOdodHynEFqxQ
   body:
     type: json
     data: |
       {
-        "name": "A train - chess and triceps",
+        "name": "A train - leg day",
         "day": 1,
         "isPublic": true
       }

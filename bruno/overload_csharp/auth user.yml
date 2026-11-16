@@ -1,21 +1,18 @@
 info:
-  name: create user
+  name: auth user
   type: http
-  seq: 1
+  seq: 2
 
 http:
   method: POST
-  url: localhost:5071/api/user
+  url: localhost:5071/api/auth/login
   body:
     type: json
     data: |
       {
-        "FirstName": "John",
-        "LastName": "Doe",
-        "Username": "jowhndoe12332",
         "Email": "jowhn.doe@example.co1m.br.com",
-        "Password": "12345672",
-        "BirthDate": "1995-08-25"
+        "Username": "",
+        "Password": "12345672"
       }
   auth: inherit
 

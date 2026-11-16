@@ -14,16 +14,20 @@ using overload.Tests.Data;
 namespace overload.Tests.Services;
 
 [Collection("Integration Test")]
-public class RoutineServiceTest : IntegrationTestBase
+public class RoutineServiceTest : IntegrationTestBase, IAsyncLifetime
 {
     private readonly Mock<IExerciseService> _exerciseServiceMock = new();
     private readonly Mock<IUserService> _userServiceMock = new();
     private readonly Mock<IRoutineExerciseService> _routineExerciseServiceMock = new();
-    private readonly RoutineService _sut; 
+    private RoutineService? _sut; 
     
 
     public RoutineServiceTest(TestFixture fixture) : base(fixture)
     {
+    }
+    public override async Task InitializeAsync()
+    {
+        await base.InitializeAsync();
         _sut = new RoutineService(
             Handler.Context!,
             _exerciseServiceMock.Object,
@@ -47,15 +51,16 @@ public class RoutineServiceTest : IntegrationTestBase
     }
 
     [Fact]
-    public async Task Should_FailCreateRoutine_When_RoutineNameAlmostExist()
+    public async Task Should_FailCreateRoutine_When_RoutineNameAlreadyExists()
     {
         int authorId = 1;
         int exerciseId = 5;
-        var routineDto = new RoutineDto();
-        await SeedUserAsync(authorId);
+        var routineDto = new RoutineDto{Name = "testing", Day = DayOfWeek.Friday, IsPublic = true};
+        var userResult = await SeedUserAsync(authorId);
+        _userServiceMock.Setup(e => e.FindUserById(It.IsAny<int>())).Returns(userResult);
         await SeedExerciseAsync(exerciseId, authorId);
 
-        await _sut.CreateRoutineAsync(authorId, routineDto); // this will save the routine and have sucess
+        await _sut!.CreateRoutineAsync(authorId, routineDto); // this will save the routine and have sucess
         var failRound = await _sut.CreateRoutineAsync(authorId, routineDto); // this will try to save the same again, and must fail with NameConflict
 
         Assert.Equal(ErrorCode.NameConflict, failRound.Code);
@@ -73,7 +78,7 @@ public class RoutineServiceTest : IntegrationTestBase
 
         var routineExerciseService = new Mock<IRoutineExerciseService>();
         RoutineService routineService = new RoutineService(fakeContext, exerciseServiceMock.Object, userServiceMock.Object, routineExerciseService.Object);
-        var result = await routineService.CreateRoutineAsync(100, new RoutineDto{});
+        var result = await routineService.CreateRoutineAsync(100, new RoutineDto{Name = "testing"});
 
         Assert.False(result.IsOk);
     }
@@ -140,8 +145,8 @@ public class RoutineServiceTest : IntegrationTestBase
 
         var firstSave = await routineService.AddRoutineExerciseAsync(new RoutineExerciseDto{ExerciseId = exerciseId},routineId, authorId);
         var secondFailureSave = await routineService.AddRoutineExerciseAsync(new RoutineExerciseDto{ExerciseId = exerciseId},routineId, authorId);
-        Assert.False(secondFailureSave.IsOk);
         Assert.Equal(ErrorCode.DataConflict, secondFailureSave.Code);
+        Assert.False(secondFailureSave.IsOk);   
     }
     
     [Fact]

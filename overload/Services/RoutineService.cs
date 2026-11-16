@@ -11,9 +11,9 @@ namespace overload.Services;
 public interface IRoutineService
 {
     public Task<Result<string>> CreateRoutineAsync(int authorId, RoutineDto routineDto);
-    public Task<Result<string>> AddRoutineExerciseAsync(RoutineExerciseDto dto, int routineId, int userId);
-    public Task<ICollection<Routine>> GetAllByIdAsync(int userId);
-    public Task<Result<ICollection<RoutineExerciseDto>>> GetExerciseByRoutineIdAsync(int routineId, int userId);
+    public Task<Result<string>> AddRoutineExerciseAsync(CreateRoutineExerciseDto dto, int routineId, int userId);
+    public Task<Result<ICollection<Routine>>> GetAllRoutinesByUserIdAsync(int userId, CancellationToken cancellationToken = default);
+    public Task<Result<ICollection<RoutineExerciseDtoResponse>>> GetAllExerciseByRoutineIdAsync(int routineId, int userId);
 }
 public class RoutineService(MyContext myContext, IExerciseService exerciseService, IUserService userService, IRoutineExerciseService routineExerciseService) : IRoutineService
 {
@@ -41,20 +41,22 @@ public class RoutineService(MyContext myContext, IExerciseService exerciseServic
         }
         return Result<string>.Error("Database problem", "A error happen when try save the changes", ErrorCode.DatabaseSaveFailure);
     }
-    public async Task<Result<string>> AddRoutineExerciseAsync(RoutineExerciseDto dto, int routineId, int userId)
+    public async Task<Result<string>> AddRoutineExerciseAsync(CreateRoutineExerciseDto dto, int routineId, int userId)
     {
         Routine? routine = await FindRoutineById(routineId);
         Exercise? exercise = await exerciseService.FindExerciseById(dto.ExerciseId);
 
         if (routine == null || exercise == null || routine.AuthorId != userId || exercise.AuthorId != userId)
         {
-            return Result<string>.Error("Not found", "The requested exercise could not be found.", ErrorCode.NotFound);
+            return Result<string>.Error("Not found", "The sent exercise or routine could not be found.", ErrorCode.NotFound);
         }
         RoutineExercise routineExercise = new RoutineExercise
         {
             ExerciseId = dto.ExerciseId,
             Order = dto.Order,
-            RoutineId = routineId
+            RoutineId = routineId,
+            Reps = dto.Reps,
+            Sets = dto.Sets
         };
         if (await IsAlreadyRegistred(routineExercise))
         {
@@ -103,12 +105,13 @@ public class RoutineService(MyContext myContext, IExerciseService exerciseServic
             && e.ExerciseId == newRoutineExercise.ExerciseId);
         return result != null;
     }
-    public async Task<ICollection<Routine>> GetAllByIdAsync(int userId)
+    public async Task<Result<ICollection<Routine>>> GetAllRoutinesByUserIdAsync(int userId, CancellationToken cancellationToken = default)
     {
         //here must implement cancelation token in future to avoid keep working after the user get out
-        return await myContext.routines.AsNoTracking().Where(e => e.AuthorId == userId).ToListAsync();
+        var result = await myContext.routines.AsNoTracking().Where(e => e.AuthorId == userId).ToListAsync(cancellationToken);
+        return Result<ICollection<Routine>>.OkWithData(result);
     }
-    public async Task<Result<ICollection<RoutineExerciseDto>>> GetExerciseByRoutineIdAsync(int routineId, int userId)
+    public async Task<Result<ICollection<RoutineExerciseDtoResponse>>> GetAllExerciseByRoutineIdAsync(int routineId, int userId)
     {
         return await routineExerciseService.FindAllExercisesFromRoutineAsync(routineId, userId);
     }

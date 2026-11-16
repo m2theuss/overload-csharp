@@ -22,7 +22,7 @@ public class UserServiceTest : IntegrationTestBase
         var result = await service.createAsync(user);
 
         Assert.True(result.IsOk);
-        Assert.Equal("Valid",result.Message);
+        Assert.Equal("Valid",result.Detail);
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class UserServiceTest : IntegrationTestBase
         UserService userService = new UserService(Handler.Context!);
         var result = await userService.createAsync(BuildUser(10));
         Assert.True(result.IsOk);
-        Assert.Equal("Valid",result.Message);
+        Assert.Equal("Valid",result.Detail);
     }
 
     [Fact]

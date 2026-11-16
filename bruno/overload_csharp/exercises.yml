@@ -1,14 +1,14 @@
 info:
-  name: exercise all
+  name: exercises
   type: http
-  seq: 4
+  seq: 5
 
 http:
   method: GET
   url: localhost:5071/api/exercises
   headers:
     - name: Authorization
-      value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEwIiwidXNlcm5hbWUiOiJqb2huZG9lMTIzMzIiLCJuYmYiOjE3OTQ1MjUzMDMsImV4cCI6MTc5NDUyODkwMywiaWF0IjoxNzk0NTI1MzAzfQ.n-a80Ptu0IOazsjONwKhPfVoznZ0jO_ri3Q0of4oDvg
+      value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE5IiwidXNlcm5hbWUiOiJqb3dobmRvZTEyMzMyIiwibmJmIjoxNzk0Nzg2ODc2LCJleHAiOjE3OTQ3OTA0NzYsImlhdCI6MTc5NDc4Njg3Nn0.5NcMhRclaBLb1bKBskNIUnLMuGacWiDgF216qhYNC74
   body:
     type: json
     data: ""

@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using overload.Entities;
 
 namespace overload.Data;
@@ -12,5 +13,7 @@ public class RoutineExercise
     public Routine? Routine{get;set;}
     public int ExerciseId{get;set;}
     public Exercise? ExerciseItem{get;set;}
+    
+    [JsonIgnore]
     public DateTime CreatedAt{get;set;} = DateTime.Now.ToUniversalTime();
 }

@@ -8,7 +8,7 @@ public class Result<T>
     public String Title{get; init;} = string.Empty;
     public T? Data{get; init;}
     public List<string> ErrorsList {get;init;} = new();
-    public string Message{get; set;} = string.Empty;
+    public string Detail{get; set;} = string.Empty;
     [JsonIgnore]
     public ErrorCode Code{get;init;}
     
@@ -18,18 +18,22 @@ public class Result<T>
             IsOk = true,
             Data = data
         };
-    public static Result<string> OkWithMessage(string message) =>
+    public static Result<string> OkWithMessage(string detail) =>
         new Result<string>
         {
             IsOk = true,
-            Message = message
+            Detail = detail
         };
-    public static Result<T> Error(string title, string message, ErrorCode code) => 
+    public static Result<T> OkEmpty() => 
+        new Result<T>(){
+            IsOk = true
+        };
+    public static Result<T> Error(string title, string detail, ErrorCode code) => 
         new Result<T>
         {
             IsOk = false, 
             Title = title, 
-            Message = message,
+            Detail = detail,
             Code = code
     };
     public static Result<T> Error(string title, ICollection<string> errorsList, ErrorCode code) => 

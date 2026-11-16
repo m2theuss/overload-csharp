@@ -1,11 +1,12 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using overload.DTOs;
 using overload.DTOs.Routines;
 using overload.Entities;
+using overload.Extensions;
 using overload.Services;
 using overload.Services.Shared;
-
 namespace overload.Controllers;
 
 [Route("api/routines")]
@@ -16,60 +17,45 @@ public class RoutineController(IRoutineService _routineService) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(RoutineDto routineDto)
     {
-        UserHasValidId(out int userId);
-        var result = await _routineService.CreateRoutineAsync(userId, routineDto);
-        int integerCode = result.Code switch{
-            ErrorCode.Ok => 200,
-            ErrorCode.DatabaseSaveFailure => 500,
-            ErrorCode.NotFound => 404,
-            ErrorCode.NameConflict => 409,
-            _ => 500
-        };
-        return Problem(
-            detail: result.Message,
-            title: result.Title,
-            statusCode: integerCode
-        );
+        var result = await _routineService.CreateRoutineAsync(User.GetUserIdFromToken(), routineDto);
+        if (!result.IsOk)
+        {
+            int integerCode = result.Code switch{
+                ErrorCode.DatabaseSaveFailure => 500,
+                ErrorCode.NotFound => 404,
+                ErrorCode.NameConflict => 409,
+                _ => 500
+            };
+            return Problem(
+                detail: result.Detail,
+                title: result.Title,
+                statusCode: integerCode
+            );
+        }
+        return Ok("Routine has been created");
     }
 
     [Authorize]
-    //add a exercise into a routine
-    [HttpPost("{routineId}/exercises")]
-    public async Task<ActionResult> AddRoutineExerciseAsync([FromBody] RoutineExerciseDto dto, int routineId) // add a exercise into a routine
+    [HttpGet]
+    public async Task<IActionResult> GetAllRoutines()
     {
-        UserHasValidId(out int authorId);
-        var result = await _routineService.AddRoutineExerciseAsync(dto, routineId, authorId);
-        return result.IsOk ? Ok(result.Message) : BadRequest(result.Message);
-
-    }
-    private bool UserHasValidId(out int userId) // method for internal validation
-    {
-        string? stringUserId = User.FindFirst("id")?.Value ?? throw new InvalidOperationException("The claim 'id' was not found in the token");
-        if(int.TryParse(stringUserId, out int value))
-        {
-            userId = value;
-            return true;
-        }
-        else
-        {
-            userId = -1;
-            return false;
-        }
-    }
-
-    [Authorize]
-    [HttpGet()]
-    public async Task<ActionResult<ICollection<Routine>>> GetAllRoutinesById()
-    {
-        UserHasValidId(out int userId);
-        return Ok(await _routineService.GetAllByIdAsync(userId));
+        var result = await _routineService.GetAllRoutinesByUserIdAsync(User.GetUserIdFromToken());
+        return result.ToActionResult(HttpContext);
     } 
 
     [Authorize]
-    [HttpGet("{routineId}/exercises")]
-    public async Task<Result<ICollection<RoutineExerciseDto>>> GetExercisesByRoutineId(int routineId)
+    [HttpPost("{routineId}/exercises")]
+    public async Task<IActionResult> AddRoutineExerciseAsync(CreateRoutineExerciseDto dto, int routineId) // add a exercise into a routine
     {
-        UserHasValidId(out int userId);
-        return await _routineService.GetExerciseByRoutineIdAsync(userId, routineId); // keep on here, for some reason dont return anyvalue
+        var result = await _routineService.AddRoutineExerciseAsync(dto, routineId, User.GetUserIdFromToken());
+        return result.ToActionResult(HttpContext);
+    }
+
+    [Authorize]
+    [HttpGet("{routineId}/exercises")]
+    public async Task<IActionResult> GetExercisesByRoutineId(int routineId)
+    {
+        var result = await _routineService.GetAllExerciseByRoutineIdAsync(routineId: routineId, userId: User.GetUserIdFromToken());
+        return result.ToActionResult(HttpContext);
     }
 }

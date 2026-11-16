@@ -1,0 +1,29 @@
+info:
+  name: exer. routine
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: localhost:5071/api/routines/12/exercises
+  headers:
+    - name: Authorization
+      value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE5IiwidXNlcm5hbWUiOiJqb3dobmRvZTEyMzMyIiwibmJmIjoxNzk0NjE2MzU2LCJleHAiOjE3OTQ2MTk5NTYsImlhdCI6MTc5NDYxNjM1Nn0.QsqQMXxOXv-fAku-05Oe6ffab8eONXhLaTF8txxhrSg
+  body:
+    type: json
+    data: |-
+      {
+        "id": 0,
+        "exerciseId": 21,
+        "order": 1,
+        "sets": 4,
+        "reps": 12
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
