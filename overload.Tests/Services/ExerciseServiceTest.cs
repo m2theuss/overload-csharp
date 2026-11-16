@@ -19,7 +19,15 @@ namespace overload.Tests.Services;
 [Collection("Integration Test")]
 public class ExerciseServiceTest : IntegrationTestBase
 {
-    public ExerciseServiceTest(TestFixture Fixture) : base (Fixture){}
+    private readonly Mock<IUserService>? _userServiceMock = new();
+    private ExerciseService? _sut;
+    public ExerciseServiceTest(TestFixture Fixture) : base (Fixture){
+    }
+    public override async Task InitializeAsync()
+    {
+        await base.InitializeAsync();
+        _sut = new ExerciseService(Handler.Context!, _userServiceMock!.Object);
+    }
     [Fact]
     public async Task Should_CreateExercise_When_UserExist()
     {
@@ -152,5 +160,48 @@ public class ExerciseServiceTest : IntegrationTestBase
 
         var result = await exerciseService.GetAllAsync(10);
         Assert.Single(result);
+    }
+
+    [Fact]
+    public async Task Should_FailToDeleteExercise_When_ExerciseNotExist()
+    {
+        var userId = 20;
+        var exerId = 20;
+        var result = await _sut!.DeleteByIdAsync(exerId, userId);
+
+        Assert.False(result.IsOk);
+        Assert.Equal(ErrorCode.NotFound, result.Code);
+    }
+
+    [Fact]
+    public async Task Should_DeleteExercise_When_ExerciseWasDeleted()
+    {
+        var userId = 20;
+        var exerId = 20;
+
+        await SeedUserAsync(userId);
+        await SeedExerciseAsync(exerId, userId);
+        var result = await _sut!.DeleteByIdAsync(userId, exerId);
+
+        Assert.True(result.IsOk);
+        Assert.Equal(ErrorCode.Ok, result.Code);
+    }
+
+    [Fact]
+    public async Task Should_FailToDeleteExercise_When_ExerciseDoesNotBelongUser()
+    {
+        var firstUserId = 20;
+        var exerId = 20;
+        
+        var FAKE = 10;
+
+        await SeedUserAsync(firstUserId);
+        await SeedUserAsync(FAKE);
+
+        await SeedExerciseAsync(exerId, firstUserId);
+        var result = await _sut!.DeleteByIdAsync(FAKE, exerId);
+
+        Assert.False(result.IsOk);
+        Assert.Equal(ErrorCode.NotFound, result.Code);
     }
 }

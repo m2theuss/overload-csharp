@@ -120,7 +120,7 @@ public class RoutineServiceTest : IntegrationTestBase, IAsyncLifetime
         
         var routineExerciseService = new Mock<IRoutineExerciseService>();
         var routineService = new RoutineService(Handler.Context!, exerciseServiceMock.Object, userServiceMock.Object, routineExerciseService.Object);
-        var result = await routineService.AddRoutineExerciseAsync(new RoutineExerciseDto(), routineId, userId);
+        var result = await routineService.AddRoutineExerciseAsync(new CreateRoutineExerciseDto(), routineId, userId);
 
         Assert.False(result.IsOk);
         Assert.Equal(ErrorCode.NotFound, result.Code);
@@ -143,8 +143,8 @@ public class RoutineServiceTest : IntegrationTestBase, IAsyncLifetime
         var routineService = new RoutineService(Handler.Context!,exerciseServiceMock.Object, userServiceMock.Object, routineExerciseService.Object);
 
 
-        var firstSave = await routineService.AddRoutineExerciseAsync(new RoutineExerciseDto{ExerciseId = exerciseId},routineId, authorId);
-        var secondFailureSave = await routineService.AddRoutineExerciseAsync(new RoutineExerciseDto{ExerciseId = exerciseId},routineId, authorId);
+        var firstSave = await routineService.AddRoutineExerciseAsync(new CreateRoutineExerciseDto{ExerciseId = exerciseId},routineId, authorId);
+        var secondFailureSave = await routineService.AddRoutineExerciseAsync(new CreateRoutineExerciseDto{ExerciseId = exerciseId},routineId, authorId);
         Assert.Equal(ErrorCode.DataConflict, secondFailureSave.Code);
         Assert.False(secondFailureSave.IsOk);   
     }
@@ -167,7 +167,7 @@ public class RoutineServiceTest : IntegrationTestBase, IAsyncLifetime
         var routineService = new RoutineService(fakeContext,exerciseServiceMock.Object, userServiceMock.Object, routineExerciseService.Object);
 
 
-        var result = await routineService.AddRoutineExerciseAsync(new RoutineExerciseDto{ExerciseId = exerciseId},routineId, authorId);
+        var result = await routineService.AddRoutineExerciseAsync(new CreateRoutineExerciseDto{ExerciseId = exerciseId},routineId, authorId);
         Assert.False(result.IsOk);
         Assert.Equal(ErrorCode.DatabaseSaveFailure, result.Code);
     }
@@ -189,7 +189,7 @@ public class RoutineServiceTest : IntegrationTestBase, IAsyncLifetime
         var routineService = new RoutineService(Handler.Context!,exerciseServiceMock.Object, userServiceMock.Object, routineExerciseService.Object);
 
 
-        var result = await routineService.AddRoutineExerciseAsync(new RoutineExerciseDto{ExerciseId = exerciseId},routineId, authorId);
+        var result = await routineService.AddRoutineExerciseAsync(new CreateRoutineExerciseDto{ExerciseId = exerciseId},routineId, authorId);
         Assert.True(result.IsOk);
         Assert.Equal(ErrorCode.Ok, result.Code);
     }

@@ -43,7 +43,7 @@ public class RoutineService(MyContext myContext, IExerciseService exerciseServic
     }
     public async Task<Result<string>> AddRoutineExerciseAsync(CreateRoutineExerciseDto dto, int routineId, int userId)
     {
-        Routine? routine = await FindRoutineById(routineId);
+        Routine? routine = FindRoutineById(routineId);
         Exercise? exercise = await exerciseService.FindExerciseById(dto.ExerciseId);
 
         if (routine == null || exercise == null || routine.AuthorId != userId || exercise.AuthorId != userId)
@@ -68,7 +68,7 @@ public class RoutineService(MyContext myContext, IExerciseService exerciseServic
         return result > 0 ? Result<string>.OkWithMessage("Exercise has been added to the routine")
             : Result<string>.Error("Database problem", "A error happen when try save the changes", ErrorCode.DatabaseSaveFailure);
     }
-    private async Task<Routine?> FindRoutineById(int routineId)
+    private Routine? FindRoutineById(int routineId)
     {
         return myContext.routines.FirstOrDefault(e => e.Id == routineId);
     }

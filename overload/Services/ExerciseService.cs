@@ -77,5 +77,6 @@ public class ExerciseService(MyContext myContext, IUserService userService) : IE
         await myContext.SaveChangesAsync();
         return Result<string>.OkEmpty();
     }
+    
 
 }
