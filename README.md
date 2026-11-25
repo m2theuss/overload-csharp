@@ -1,92 +1,113 @@
 # Overload
 
-**Uma API para organizar exercícios e montar rotinas de treino.**
+**API REST para organizar exercícios e montar rotinas de treino personalizadas.**
 
-Overload é uma API REST em C# e ASP.NET Core para cadastro e autenticação de usuários, gerenciamento de exercícios e criação de rotinas semanais. Os recursos são associados ao usuário autenticado, com persistência em PostgreSQL.
+O Overload é um projeto backend desenvolvido em C# e ASP.NET Core. Usuários podem criar uma conta, manter seu catálogo de exercícios e organizar esses exercícios em rotinas semanais, com séries, repetições e ordem de execução.
 
 [![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![C#](https://img.shields.io/badge/C%23-239120?logo=csharp&logoColor=white)](https://learn.microsoft.com/dotnet/csharp/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-database-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Status](https://img.shields.io/badge/status-em%20desenvolvimento-7952B3)](#estado-do-projeto)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./overload/LICENSE)
 
-## Visão geral
+## Destaques técnicos
 
-O projeto oferece uma base para representar os dados de um treino:
+Uma API construída com atenção a regras de domínio, segurança e organização:
 
-- **Usuários** podem criar uma conta e entrar com nome de usuário ou e-mail.
-- **Exercícios** registram nome, grupo muscular, tipo, visibilidade e autor.
-- **Rotinas** organizam exercícios por dia da semana e mantêm a ordem de execução.
-
-A autenticação usa JWT. Exercícios e rotinas são associados ao usuário que os criou; o campo de visibilidade existe no modelo, mas ainda não há feed público nem compartilhamento entre usuários.
+- autenticação stateless com JWT e senhas protegidas com BCrypt;
+- autorização por proprietário: exercícios e rotinas são acessados no contexto do usuário autenticado;
+- regras de domínio para evitar nomes repetidos, exercícios duplicados em uma rotina e associações entre usuários diferentes;
+- persistência relacional com Entity Framework Core, PostgreSQL e migrations;
+- validação de dados de entrada e tratamento de exceções com `ProblemDetails`;
+- testes automatizados dos serviços usando SQLite em memória, sem exigir PostgreSQL para executar a suíte.
 
 ## Funcionalidades
 
-- Cadastro de usuários, validação dos dados e armazenamento de senha com hash BCrypt.
-- Login com nome de usuário ou e-mail e emissão de token JWT.
-- Consulta das informações da conta autenticada.
-- Criação e listagem de exercícios próprios, além de atualização parcial com verificação de autoria.
+- Cadastro de usuários com validação e verificação de nome de usuário/e-mail duplicados.
+- Login com nome de usuário **ou** e-mail e emissão de token JWT com validade de 60 minutos.
+- Consulta de informações da conta autenticada.
+- Criação, listagem, atualização parcial e exclusão de exercícios próprios.
 - Criação e listagem de rotinas próprias.
-- Inclusão de exercícios próprios em uma rotina própria, com controle de ordem e prevenção de duplicatas.
-- Persistência PostgreSQL com Entity Framework Core e migrations.
-- Enums serializados como texto e respostas de erro no formato `ProblemDetails`.
+- Inclusão de exercícios próprios em uma rotina própria, com séries, repetições e posição.
+- Consulta dos exercícios de uma rotina em ordem de execução.
+- Enums de domínio serializados como texto, como `Chest`, `FreeWeight` e `Monday`.
+- Visibilidade configurável para exercícios e rotinas.
 
-## Comece aqui
+## Tecnologias
+
+| Área | Tecnologias |
+| --- | --- |
+| API | C#, ASP.NET Core 10 |
+| Persistência | Entity Framework Core 10, PostgreSQL, Npgsql |
+| Autenticação | JWT Bearer, BCrypt |
+| Testes | xUnit, Moq, SQLite em memória |
+| Chamadas manuais | Coleção Bruno em [`bruno/overload_csharp`](./bruno/overload_csharp) |
+
+## Como executar
 
 ### Pré-requisitos
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
-- PostgreSQL
-- Ferramenta `dotnet-ef` para aplicar migrations
+- PostgreSQL em execução
+- `dotnet-ef` instalado globalmente para aplicar migrations (`dotnet tool install --global dotnet-ef`), caso ainda não esteja disponível
 
-### Configure o ambiente
+### Configurar conexão e chave JWT
 
-Crie um banco PostgreSQL e configure a connection string e a chave JWT no ambiente. Exemplo para Bash:
+Configure as variáveis de ambiente antes de iniciar. Exemplo no PowerShell:
 
-```bash
-export ConnectionStrings__PostgresConnection="Host=localhost;Port=5432;Database=overload;Username=postgres;Password=sua-senha"
-export AuthConfiguration__Key="substitua-por-uma-chave-secreta-local"
+```powershell
+$env:ConnectionStrings__PostgresConnection = "Host=localhost;Port=5432;Database=overload_db;Username=postgres;Password=sua-senha"
+$env:AuthConfiguration__Key = "substitua-por-uma-chave-aleatoria-com-pelo-menos-32-caracteres"
 ```
 
-Use uma chave secreta própria para cada ambiente. Não inclua credenciais ou segredos no repositório.
+No Bash:
 
-### Restaure, aplique as migrations e inicie a API
+```bash
+export ConnectionStrings__PostgresConnection="Host=localhost;Port=5432;Database=overload_db;Username=postgres;Password=sua-senha"
+export AuthConfiguration__Key="substitua-por-uma-chave-aleatoria-com-pelo-menos-32-caracteres"
+```
+
+Configure credenciais e uma chave aleatória próprias para cada ambiente. As variáveis de ambiente sobrescrevem os valores de configuração; mantenha segredos fora do versionamento.
+
+### Restaurar, criar o esquema e iniciar
 
 Na raiz do repositório:
 
-```bash
-dotnet restore overload/overload-csharp.csproj
-dotnet ef database update --project overload/overload-csharp.csproj
-dotnet run --project overload/overload-csharp.csproj
+```powershell
+dotnet restore .\overload\overload-csharp.csproj
+dotnet ef database update --project .\overload\overload-csharp.csproj
+dotnet run --project .\overload\overload-csharp.csproj --launch-profile http
 ```
 
-O endereço HTTP será exibido no terminal. Use-o como base para as chamadas abaixo.
+O perfil `http` inicia a API em `http://localhost:5071`. O endereço e os perfis de execução estão definidos em [`launchSettings.json`](./overload/Properties/launchSettings.json).
 
 ## API
 
-Todas as rotas usam o prefixo `/api`. Rotas protegidas precisam do cabeçalho:
+Todas as rotas começam com `/api`. As rotas marcadas como protegidas exigem:
 
 ```http
 Authorization: Bearer <token>
 ```
 
-Obtenha o token em `POST /api/Auth/login`. As rotas de exercícios e rotinas atuam sobre recursos do usuário autenticado; as rotas de listagem não são um feed público.
+Obtenha um token em `POST /api/Auth/login`. A autorização associa as operações aos recursos pertencentes ao usuário autenticado.
 
 | Método | Rota | Acesso | Descrição |
 | --- | --- | --- | --- |
-| `GET` | `/api/User` | Público | Retorna uma mensagem de identificação da API |
-| `POST` | `/api/User` | Público | Cria uma conta |
-| `POST` | `/api/Auth/login` | Público | Autentica por nome de usuário ou e-mail |
-| `GET` | `/api/User/info` | JWT | Retorna o nome e o identificador do usuário autenticado |
-| `POST` | `/api/exercises` | JWT | Cria um exercício para o usuário autenticado |
-| `GET` | `/api/exercises` | JWT | Lista os exercícios do usuário autenticado |
+| `GET` | `/api/User` | Público | Retorna uma mensagem da API |
+| `POST` | `/api/User` | Público | Cadastra um usuário |
+| `POST` | `/api/Auth/login` | Público | Autentica com nome de usuário ou e-mail |
+| `GET` | `/api/User/info` | JWT | Retorna nome de usuário e ID autenticado |
+| `POST` | `/api/exercises` | JWT | Cria um exercício |
+| `GET` | `/api/exercises` | JWT | Lista os exercícios do usuário |
 | `PATCH` | `/api/exercises/{exerciseId}` | JWT | Atualiza parcialmente um exercício próprio |
-| `POST` | `/api/routines` | JWT | Cria uma rotina para o usuário autenticado |
-| `POST` | `/api/routines/{routineId}/exercises` | JWT | Adiciona um exercício próprio a uma rotina própria |
-| `GET` | `/api/routines/users/{anonId}/routines` | JWT | Lista as rotinas do usuário autenticado; outro identificador retorna `404` |
+| `DELETE` | `/api/exercises/{id}` | JWT | Exclui um exercício próprio |
+| `POST` | `/api/routines` | JWT | Cria uma rotina |
+| `GET` | `/api/routines` | JWT | Lista as rotinas do usuário |
+| `POST` | `/api/routines/{routineId}/exercises` | JWT | Adiciona um exercício próprio à rotina |
+| `GET` | `/api/routines/{routineId}/exercises` | JWT | Lista os exercícios da rotina em ordem |
 
-### Fluxo de autenticação
+### Exemplo de fluxo
 
-Cadastre a conta:
+Cadastre um usuário:
 
 ```http
 POST /api/User
@@ -102,7 +123,7 @@ Content-Type: application/json
 }
 ```
 
-Entre com o nome de usuário ou e-mail e a senha:
+Autentique-se informando **um** identificador (nome de usuário ou e-mail):
 
 ```http
 POST /api/Auth/login
@@ -115,9 +136,7 @@ Content-Type: application/json
 }
 ```
 
-A resposta contém o token e o tipo `Bearer`. Envie-os no cabeçalho `Authorization` para as rotas protegidas.
-
-### Exercícios
+A resposta contém `token` e `tokenType` (`Bearer`). Use o token nas chamadas protegidas.
 
 Crie um exercício:
 
@@ -130,15 +149,13 @@ Content-Type: application/json
   "name": "Supino reto",
   "muscle": "Chest",
   "type": "FreeWeight",
-  "isPublic": true
+  "isPublic": false
 }
 ```
 
-Grupos musculares aceitos: `Chest`, `Back`, `Shoulders`, `Biceps`, `Triceps`, `Forearms`, `Abs`, `Quads`, `Hamstrings`, `Glutes` e `Calves`. Tipos aceitos: `Machine`, `FreeWeight`, `Bodyweight` e `Cable`.
+Grupos musculares aceitos: `Chest`, `Back`, `Shoulders`, `Biceps`, `Triceps`, `Forearms`, `Abs`, `Quads`, `Hamstrings`, `Glutes` e `Calves`. Tipos de exercício: `Machine`, `FreeWeight`, `Bodyweight` e `Cable`.
 
-### Rotinas
-
-Crie uma rotina. `day` aceita os dias da semana em inglês: `Monday`, `Tuesday`, `Wednesday`, `Thursday`, `Friday`, `Saturday` ou `Sunday`:
+Crie uma rotina e inclua nela um exercício do mesmo usuário:
 
 ```http
 POST /api/routines
@@ -152,8 +169,6 @@ Content-Type: application/json
 }
 ```
 
-Adicione à rotina um exercício que pertença ao mesmo usuário. O `routineId` é informado na rota; `order` define a posição do exercício:
-
 ```http
 POST /api/routines/10/exercises
 Authorization: Bearer <token>
@@ -161,66 +176,76 @@ Content-Type: application/json
 
 {
   "exerciseId": 17,
-  "order": 1
+  "order": 1,
+  "sets": 4,
+  "reps": 10
 }
 ```
 
-Liste as rotinas da própria conta, substituindo `{anonId}` pelo identificador do usuário autenticado:
+`order: 0` adiciona o exercício ao final da rotina; uma posição positiva permite colocá-lo naquela posição. Séries aceitam valores de 1 a 50, e repetições de 1 a 500.
+
+Consulte a rotina:
 
 ```http
-GET /api/routines/users/10/routines
+GET /api/routines/10/exercises
 Authorization: Bearer <token>
 ```
 
-## Testes
+## Arquitetura
 
-Execute a suíte automatizada a partir da raiz:
-
-```bash
-dotnet test overload.Tests/overload.Tests.csproj
-```
-
-A cobertura automatizada ainda é inicial e focada nos serviços. Os cenários existentes verificam:
-
-- criação de usuário com dados válidos e rejeição de cadastro duplicado;
-- criação de exercício para usuário existente;
-- atualização de exercício pelo autor e rejeição da atualização por outro usuário.
-
-Os testes usam SQLite em memória e xUnit; não precisam de uma instância PostgreSQL. O arquivo `UnitTest1` ainda contém apenas um teste-template vazio, sem assertions. A suíte não cobre atualmente os endpoints HTTP nem os fluxos de rotina.
-
-### Chamadas manuais com Bruno
-
-Há uma coleção Bruno em [`bruno/overload_csharp`](./bruno/overload_csharp) com chamadas de exemplo para cadastro, login, informações do usuário, exercícios e rotinas. Importe a coleção no Bruno, inicie a API e substitua os valores de autorização mascarados por um token válido. As URLs da coleção usam `localhost:5071`; ajuste o endereço caso a API esteja rodando em outra porta.
-
-## Organização do código
+O código separa a camada HTTP, regras de aplicação, contratos da API, domínio e persistência:
 
 ```text
 overload/
-├── Controllers/   # Endpoints HTTP
-├── Services/      # Regras de cadastro, autenticação, exercícios e rotinas
-├── DTOs/          # Contratos de entrada e atualização da API
-├── Entities/      # Modelos do domínio e enums
-├── Data/          # Contexto e configurações do Entity Framework Core
-├── Migrations/    # Evolução do esquema do banco de dados
-├── Exceptions/    # Tratamento de exceções e respostas de erro
+├── Controllers/   # Endpoints e tradução de resultados HTTP
+├── Services/      # Regras de usuário, autenticação, exercícios e rotinas
+├── DTOs/          # Contratos de entrada e saída
+├── Entities/      # Entidades e enums do domínio
+├── Data/          # DbContext e configurações do Entity Framework Core
+├── Migrations/    # Histórico de evolução do esquema
+├── Exceptions/    # Tratamento global e erros da API
+├── Extensions/    # Integração entre resultados e respostas HTTP
 └── Utils/         # Geração e validação de tokens JWT
 
-overload.Tests/    # Testes automatizados de serviços
-bruno/             # Coleção de chamadas HTTP para Bruno
+overload.Tests/    # Testes automatizados dos serviços
+bruno/             # Coleção Bruno para chamadas HTTP manuais
 ```
 
-## Tecnologias
+Modelo central:
 
-- C# e ASP.NET Core 10
-- Entity Framework Core e PostgreSQL com Npgsql
-- JWT e BCrypt
-- xUnit, Moq e SQLite para testes
-- Bruno para chamadas HTTP manuais
+```mermaid
+erDiagram
+    USER ||--o{ EXERCISE : cria
+    USER ||--o{ ROUTINE : cria
+    ROUTINE ||--o{ ROUTINE_EXERCISE : organiza
+    EXERCISE ||--o{ ROUTINE_EXERCISE : referencia
+    ROUTINE_EXERCISE {
+        int order
+        int sets
+        int reps
+    }
+```
 
-## Estado do projeto
+`RoutineExercise` representa a associação entre uma rotina e um exercício e guarda os dados específicos daquele treino: posição, séries e repetições.
 
-O projeto está em desenvolvimento. Cadastro, autenticação, exercícios e operações básicas de rotina já estão implementados. A visibilidade dos recursos ainda não oferece uma experiência pública, e a cobertura automatizada dos endpoints e das rotinas é trabalho futuro.
+## Testes
+
+Execute os testes a partir da raiz:
+
+```powershell
+dotnet test .\overload.Tests\overload.Tests.csproj
+```
+
+**29 testes aprovados** na execução mais recente. A suíte exercita validação e cadastro de usuários, autenticação por e-mail ou nome de usuário, regras de autoria e operações de exercícios e rotinas. A infraestrutura usa SQLite em memória, sem exigir PostgreSQL para testar.
+
+## Coleção Bruno
+
+Importe [`bruno/overload_csharp`](./bruno/overload_csharp) no Bruno para experimentar chamadas da API. A coleção usa `localhost:5071`; inicie o perfil `http` e use o token obtido no login nas requisições protegidas.
+
+## Sobre o projeto
+
+O Overload reúne autenticação, catálogo de exercícios e planejamento de rotinas em uma API .NET com persistência relacional e regras de acesso por usuário. O projeto demonstra uma base consistente para evoluir um produto de treino, da modelagem do domínio às chamadas HTTP e aos testes automatizados.
 
 ## Licença
 
-Distribuído sob a licença [MIT](./overload/LICENSE).
+Este projeto está sob a licença [MIT](./overload/LICENSE).
