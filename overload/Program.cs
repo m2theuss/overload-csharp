@@ -9,6 +9,7 @@ using System.Text;
 using overload.Utils;
 using System.Text.Json.Serialization;
 
+DotNetEnv.Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthentication(opt =>{
     opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -53,6 +54,11 @@ builder.Services.AddScoped<IRoutineService, RoutineService>();
 builder.Services.AddScoped<IRoutineExerciseService, RoutineExerciseService>();
 builder.Services.AddScoped<IJwtUtils,JwtUtils>();
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<MyContext>();
+    dbContext.Database.Migrate();
+}
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseExceptionHandler();
