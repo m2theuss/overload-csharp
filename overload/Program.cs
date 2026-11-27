@@ -2,31 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using overload.Common.Converters;
 using overload.Data;
 using overload.Exceptions;
-using overload.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using overload.Utils;
 using System.Text.Json.Serialization;
+using overload.Extensions.Configurations;
 
 DotNetEnv.Env.Load();
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddAuthentication(opt =>{
-    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(opt => {
-    opt.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["AuthConfiguration:Issuer"],
-        ValidAudience = builder.Configuration["AuthConfiguration:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["AuthConfiguration:Key"]!))
-    };
-});
+builder.AddJwtAuthentication();
 
 builder.Services.AddControllers()
     .ConfigureApiBehaviorOptions(options =>
@@ -47,12 +28,7 @@ builder.Services.AddDbContext<MyContext>(options =>
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IExerciseService, ExerciseService>();
-builder.Services.AddScoped<IRoutineService, RoutineService>();
-builder.Services.AddScoped<IRoutineExerciseService, RoutineExerciseService>();
-builder.Services.AddScoped<IJwtUtils,JwtUtils>();
+builder.Services.AddDependencies();
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
@@ -60,6 +36,7 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 app.UseAuthentication();
+
 app.UseAuthorization();
 app.UseExceptionHandler();
 app.MapControllers();
